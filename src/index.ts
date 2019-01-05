@@ -21,12 +21,23 @@ createConnection().then(async connection => {
 
 }).catch(error => console.log(error));
 
-const { ApolloServer, gql } = require('apollo-server');
+import { ApolloServer, gql } from 'apollo-server';
+
+import { ObjectType, Field, Resolver, Query, FieldResolver, Arg, buildSchema } from 'type-graphql'
+
+@ObjectType()
+class Book {
+  @Field()
+  title: string;
+
+  @Field()
+  author: string;
+}
 
 // This is a (sample) collection of books we'll be able to query
 // the GraphQL server for.  A more complete example might fetch
 // from an existing data source like a REST API or database.
-const books = [
+const books: Array<Book> = [
   {
     title: 'Harry Potter and the Chamber of Secrets',
     author: 'J.K. Rowling',
@@ -35,7 +46,23 @@ const books = [
     title: 'Jurassic Park',
     author: 'Michael Crichton',
   },
-];
+]
+
+@Resolver(Book)
+class BookResolver {
+  @Query(returns => [Book])
+  books() {
+    return books
+  }
+
+  // XXX or maybe we should use 404?
+  @Query(returns => Book, { nullable: true })
+  book(@Arg('name') name: string) {
+    const regexp = new RegExp(name, 'i')
+    const book = books.find(b => regexp.test(b.author))
+    return book
+  }
+}
 
 // Type definitions define the "shape" of your data and specify
 // which ways the data can be fetched from the GraphQL server.
@@ -71,14 +98,12 @@ const resolvers = {
   },
 };
 
-// In the most basic sense, the ApolloServer can be started
-// by passing type definitions (typeDefs) and the resolvers
-// responsible for fetching the data for those types.
-const server = new ApolloServer({ typeDefs, resolvers });
+async function start() {
+  const schema = await buildSchema({ resolvers: [BookResolver] })
 
-// This `listen` method launches a web-server.  Existing apps
-// can utilize middleware options, which we'll discuss later.
-server.listen().then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
-});
+  const server = new ApolloServer({ schema })
+  const { url } = await server.listen()
+  console.log(`🚀  Server ready at ${url}`)
+}
 
+start()
