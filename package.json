@@ -17,6 +17,7 @@
       "typeorm": "0.2.11"
    },
    "scripts": {
-      "start": "ts-node-dev src/index.ts"
+      "start": "ts-node-dev src/index.ts",
+      "start:prod": "ts-node --transpileOnly src/index.ts"
    }
 }
