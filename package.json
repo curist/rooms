@@ -3,13 +3,15 @@
    "version": "0.0.1",
    "description": "Awesome project developed with TypeORM.",
    "devDependencies": {
+      "@types/express": "^4.16.0",
       "@types/node": "^10.12.18",
       "ts-node": "7.0.1",
       "ts-node-dev": "^1.0.0-pre.32",
       "typescript": "3.2.2"
    },
    "dependencies": {
-      "apollo-server": "^2.3.1",
+      "apollo-server-express": "^2.3.1",
+      "express": "^4.16.4",
       "graphql": "^14.0.2",
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.4",
