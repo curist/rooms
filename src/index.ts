@@ -8,7 +8,7 @@ TypeORM.useContainer(Container)
 TypeGraphQL.useContainer(Container)
 
 // only uncomment if we want to do that data initialization
-// import 'init-data'
+// import './init-data'
 
 import * as express from 'express'
 import { ApolloServer, gql } from 'apollo-server-express';
