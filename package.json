@@ -16,7 +16,9 @@
       "reflect-metadata": "^0.1.10",
       "sqlite3": "^4.0.4",
       "type-graphql": "^0.16.0",
-      "typeorm": "0.2.11"
+      "typedi": "^0.8.0",
+      "typeorm": "0.2.11",
+      "typeorm-typedi-extensions": "^0.2.1"
    },
    "scripts": {
       "start": "ts-node-dev src/index.ts",

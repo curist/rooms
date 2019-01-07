@@ -4,7 +4,9 @@ import { ObjectType, Field } from 'type-graphql'
 @Entity()
 @ObjectType({ description: 'Book Type' })
 export class Book {
+
   @PrimaryGeneratedColumn()
+  @Field()
   id: number
 
   @Column()
