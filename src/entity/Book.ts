@@ -1,6 +1,6 @@
 import { ObjectType, Field } from 'type-graphql'
 
-@ObjectType()
+@ObjectType({ description: 'Book Type' })
 export class Book {
   @Field()
   title: string;

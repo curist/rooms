@@ -27,6 +27,7 @@ import { buildSchema } from 'type-graphql'
 import resolvers from './resolver/resolvers'
 
 async function start() {
+  // TODO build user query resolver
   const schema = await buildSchema({ resolvers })
 
   const server = new ApolloServer({ schema })

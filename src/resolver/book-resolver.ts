@@ -20,7 +20,10 @@ class BookResolver {
   }
 
   // XXX or maybe we should use 404?
-  @Query(returns => Book, { nullable: true })
+  @Query(returns => Book, {
+    nullable: true,
+    description: 'get a specific book, can be null',
+  })
   book(@Arg('name') name: string) {
     const regexp = new RegExp(name, 'i')
     const book = books.find(b => regexp.test(b.author))
