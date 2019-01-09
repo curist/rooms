@@ -7,8 +7,18 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 @Resolver(User)
 class UserResolver {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) readonly userRepository: Repository<User>,
   ) {}
+
+  @Query(returns => User)
+  async author(@Arg('authorName') authorName: string) {
+    const author = await this.userRepository.createQueryBuilder('user')
+      .where('LOWER(printf("%s %s", user.firstName, user.lastName)) LIKE LOWER(:author)', {
+        author: `%${authorName}%` 
+      })
+      .getOne()
+    return author
+  }
 
   @Query(returns => [User])
   users() {

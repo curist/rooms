@@ -8,8 +8,8 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 @Resolver(Book)
 class BookResolver {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(Book) private readonly bookRepository: Repository<Book>,
+    @InjectRepository(User) readonly userRepository: Repository<User>,
+    @InjectRepository(Book) readonly bookRepository: Repository<Book>,
   ) {}
 
   @Query(returns => [Book])
@@ -18,16 +18,18 @@ class BookResolver {
   }
 
   // XXX or maybe we should use 404?
-  // @Query(returns => Book, {
-  //   nullable: true,
-  //   description: 'get a specific book, can be null',
-  // })
-  // async book(@Arg('author') author: string) {
-  //   const book = await this.bookRepository.createQueryBuilder('book')
-  //     .where('LOWER(book.author) LIKE LOWER(:author)', { author: `%${author}%` })
-  //     .getOne()
-  //   return book
-  // }
+  @Query(returns => [Book], {
+    description: 'get books by author',
+  })
+  async authorBook(@Arg('authorName') authorName: string) {
+    const author = await this.userRepository.createQueryBuilder('user')
+      .where('LOWER(printf("%s %s", user.firstName, user.lastName)) LIKE LOWER(:author)', {
+        author: `%${authorName}%` 
+      })
+      .getOne()
+    const books = await this.bookRepository.find({ where: { authorId: author.id } })
+    return books
+  }
 
   @FieldResolver()
   author(@Root() book: Book) {
