@@ -15,12 +15,8 @@ import { buildSchema } from 'type-graphql'
 import resolvers from './resolver/resolvers'
 
 async function start() {
-  const shouldInit = false
-  if(shouldInit) {
-    await initData()
-  } else {
-    await TypeORM.createConnection()
-  }
+  const conn = await TypeORM.createConnection()
+  await initData(conn)
 
   // TODO build user query resolver
   const schema = await buildSchema({ resolvers })

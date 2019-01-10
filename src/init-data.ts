@@ -2,8 +2,14 @@ import { createConnection } from 'typeorm'
 import { User } from './entity/User'
 import { Book } from './entity/Book'
 
-export default async function init() {
-  const connection = await createConnection()
+export default async function init(connection) {
+  {
+    const books = await connection.manager.find(Book)
+    if(books.length > 0) {
+      return
+    }
+  }
+
   console.log('Inserting a new user into the database...')
   const rowling = new User()
   rowling.firstName = 'J.K.'

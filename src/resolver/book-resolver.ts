@@ -27,6 +27,9 @@ class BookResolver {
         author: `%${authorName}%` 
       })
       .getOne()
+    if(!author) {
+      return []
+    }
     const books = await this.bookRepository.find({ where: { authorId: author.id } })
     return books
   }

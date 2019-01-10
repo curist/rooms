@@ -10,7 +10,7 @@ class UserResolver {
     @InjectRepository(User) readonly userRepository: Repository<User>,
   ) {}
 
-  @Query(returns => User)
+  @Query(returns => User, { nullable: true })
   async author(@Arg('authorName') authorName: string) {
     const author = await this.userRepository.createQueryBuilder('user')
       .where('LOWER(printf("%s %s", user.firstName, user.lastName)) LIKE LOWER(:author)', {
