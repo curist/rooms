@@ -30,13 +30,13 @@ class BookResolver {
     if(!author) {
       return []
     }
-    const books = await this.bookRepository.find({ where: { authorId: author.id } })
+    const books = await this.bookRepository.find({ where: { author } })
     return books
   }
 
   @FieldResolver()
-  author(@Root() book: Book) {
-    return this.userRepository.findOne(book.authorId, { cache: 1000 });
+  someNumber() {
+    return +new Date
   }
 }
 

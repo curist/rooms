@@ -7,7 +7,7 @@ module.exports = {
   ...DB_CONFIG,
   type: 'sqljs',
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [
     'src/entity/**/*.ts'
   ],

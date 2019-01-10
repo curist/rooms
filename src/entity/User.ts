@@ -1,24 +1,31 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
-@Entity()
+import { Book } from './book'
+
 @ObjectType({ description: 'User Type' })
+@Entity()
 export class User {
 
-  @PrimaryGeneratedColumn()
   @Field()
+  @PrimaryGeneratedColumn()
   id: number
 
-  @Column()
   @Field()
+  @Column()
   firstName: string
 
-  @Column()
   @Field()
+  @Column()
   lastName: string
 
-  @Column()
   @Field()
+  @Column()
   age: number
 
+  // @Field(type => [Book])
+  // @OneToMany(type => Book, book => book.author)
+  // books: Book[]
+
 }
+
