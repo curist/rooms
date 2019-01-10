@@ -7,8 +7,7 @@ import * as TypeGraphQL from 'type-graphql'
 TypeORM.useContainer(Container)
 TypeGraphQL.useContainer(Container)
 
-// only uncomment if we want to do that data initialization
-// import './init-data'
+import initData from  './init-data'
 
 import * as express from 'express'
 import { ApolloServer, gql } from 'apollo-server-express';
@@ -16,7 +15,12 @@ import { buildSchema } from 'type-graphql'
 import resolvers from './resolver/resolvers'
 
 async function start() {
-  await TypeORM.createConnection()
+  const shouldInit = false
+  if(shouldInit) {
+    await initData()
+  } else {
+    await TypeORM.createConnection()
+  }
 
   // TODO build user query resolver
   const schema = await buildSchema({ resolvers })

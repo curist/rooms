@@ -2,7 +2,8 @@ import { createConnection } from 'typeorm'
 import { User } from './entity/User'
 import { Book } from './entity/Book'
 
-createConnection().then(async connection => {
+export default async function init() {
+  const connection = await createConnection()
   console.log('Inserting a new user into the database...')
   const rowling = new User()
   rowling.firstName = 'J.K.'
@@ -34,6 +35,5 @@ createConnection().then(async connection => {
   console.log('Loaded books: ', books)
 
   console.log('Here you can setup and run express/koa/any other framework.')
-
-}).catch(error => console.log(error))
+}
 
