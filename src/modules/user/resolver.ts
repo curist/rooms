@@ -89,7 +89,7 @@ class UserResolver {
     }, JWT_SECRET, {
       expiresIn: '1h',
     })
-    res.cookie('jwt', token)
+    res.cookie('jwt', token, { httpOnly: true })
     return user
   }
 
