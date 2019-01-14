@@ -13,8 +13,11 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
+
+import jwt from './middlewares/jwt'
 import resolvers from './resolvers'
 import entities from './entities'
+import { authChecker } from './auth-checker'
 
 async function start() {
   await TypeORM.createConnection({
@@ -27,15 +30,19 @@ async function start() {
   })
 
   // TODO build user query resolver
-  const schema = await buildSchema({ resolvers })
+  const schema = await buildSchema({
+    resolvers,
+    authChecker,
+  })
 
   const app = express()
 
   app.use(cookieParser())
+  app.use(jwt)
 
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }) => ({ req, res }),
+    context: ({ req, res }) => ({ req, res, user: req.user }),
     formatError: formatArgumentValidationError,
   })
   server.applyMiddleware({ app })

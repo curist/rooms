@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
+import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { plainToClass } from 'class-transformer'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -35,6 +35,12 @@ class UserResolver {
     return this.userRepository.find()
   }
 
+  @Authorized()
+  @Query(returns => User)
+  me(@Ctx() { user }: Context) {
+    return user
+  }
+
   @Mutation(returns => User)
   async register(@Arg('data') data: RegisterInput) {
     if(data.password !== data.passwordConfirmation) {
@@ -67,6 +73,12 @@ class UserResolver {
     })
     res.cookie('jwt', token)
     return user
+  }
+
+  @Mutation(returns => Boolean)
+  logout(@Ctx() { res }: Context) {
+    res.clearCookie('jwt')
+    return true
   }
 }
 
