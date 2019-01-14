@@ -11,6 +11,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 import { User } from './User'
 import { RegisterInput } from './input/register'
 import { LoginInput } from './input/login'
+import { UpdateInput } from './input/update'
 
 import { JWT_SECRET } from '../../config'
 
@@ -38,7 +39,7 @@ class UserResolver {
   @Authorized()
   @Query(returns => User)
   me(@Ctx() { user }: Context) {
-    return user
+    return this.userRepository.findOne(user.id)
   }
 
   @Mutation(returns => User)
@@ -50,6 +51,23 @@ class UserResolver {
     const newUser = plainToClass(User, data)
     await this.userRepository.save(newUser)
     return newUser
+  }
+
+  @Authorized()
+  @Mutation(returns => User)
+  async updateUser(
+    @Arg('data') data: UpdateInput,
+    @Ctx() { user: currentUser }: Context,
+  ) {
+    const user = await this.userRepository.findOne(currentUser.id)
+    if(data.displayName) {
+      user.displayName = data.displayName
+    }
+    if(data.password) {
+      user.password = await bcrypt.hash(data.password, 10)
+    }
+    await this.userRepository.save(user)
+    return user
   }
 
   @Mutation(returns => User)
