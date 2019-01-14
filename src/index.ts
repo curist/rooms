@@ -7,23 +7,44 @@ import * as TypeGraphQL from 'type-graphql'
 TypeORM.useContainer(Container)
 TypeGraphQL.useContainer(Container)
 
-import initData from  './init-data'
+const { formatArgumentValidationError } = TypeGraphQL
 
-import * as express from 'express'
+import express from 'express'
+import cookieParser from 'cookie-parser'
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
-import resolvers from './resolver/resolvers'
+
+import jwt from './middlewares/jwt'
+import resolvers from './resolvers'
+import entities from './entities'
+import { authChecker } from './auth-checker'
 
 async function start() {
-  const conn = await TypeORM.createConnection()
-  await initData(conn)
+  await TypeORM.createConnection({
+    type: 'sqljs',
+    location: 'database.sqlite',
+    autoSave: true,
+    synchronize: true,
+    logging: true,
+    entities,
+  })
 
   // TODO build user query resolver
-  const schema = await buildSchema({ resolvers })
+  const schema = await buildSchema({
+    resolvers,
+    authChecker,
+  })
 
   const app = express()
 
-  const server = new ApolloServer({ schema })
+  app.use(cookieParser())
+  app.use(jwt)
+
+  const server = new ApolloServer({
+    schema,
+    context: ({ req, res }) => ({ req, res, user: req.user }),
+    formatError: formatArgumentValidationError,
+  })
   server.applyMiddleware({ app })
   const port = process.env.PORT || 4000
   const url = await app.listen({ port })

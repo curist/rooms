@@ -1,8 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
-import { Book } from './book'
-
 @ObjectType({ description: 'User Type' })
 @Entity()
 export class User {
@@ -13,19 +11,13 @@ export class User {
 
   @Field()
   @Column()
-  firstName: string
+  email: string
 
   @Field()
   @Column()
-  lastName: string
+  displayName: string
 
-  @Field()
   @Column()
-  age: number
-
-  // @Field(type => [Book])
-  // @OneToMany(type => Book, book => book.author)
-  // books: Book[]
-
+  password: string
 }
 
