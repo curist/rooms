@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
 import { plainToClass } from 'class-transformer'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 import { Context } from '../../types'
 
@@ -10,6 +11,8 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 import { User } from './User'
 import { RegisterInput } from './input/register'
 import { LoginInput } from './input/login'
+
+import { JWT_SECRET } from '../../config'
 
 @Resolver(User)
 class UserResolver {
@@ -48,7 +51,6 @@ class UserResolver {
     @Arg('data') { email, password }: LoginInput,
     @Ctx() { req, res }: Context,
   ) {
-    console.log(req.cookies)
     const user = await this.userRepository.findOne({ where: { email } })
     if(!user) {
       throw new Error('user not found')
@@ -57,7 +59,13 @@ class UserResolver {
     if(!match) {
       throw new Error('wrong password')
     }
-    res.cookie('jwt', 'jjjjjwt')
+    const token = jwt.sign({
+      id: user.id,
+      email: user.email,
+    }, JWT_SECRET, {
+      expiresIn: '1h',
+    })
+    res.cookie('jwt', token)
     return user
   }
 }
