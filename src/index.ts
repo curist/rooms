@@ -7,23 +7,34 @@ import * as TypeGraphQL from 'type-graphql'
 TypeORM.useContainer(Container)
 TypeGraphQL.useContainer(Container)
 
-import initData from  './init-data'
+const { formatArgumentValidationError } = TypeGraphQL
 
-import * as express from 'express'
+import express from 'express'
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
-import resolvers from './resolver/resolvers'
+import resolvers from './resolvers'
+import entities from './entities'
 
 async function start() {
-  const conn = await TypeORM.createConnection()
-  await initData(conn)
+  await TypeORM.createConnection({
+    type: 'sqljs',
+    location: 'database.sqlite',
+    autoSave: true,
+    synchronize: true,
+    logging: true,
+    entities,
+  })
 
   // TODO build user query resolver
   const schema = await buildSchema({ resolvers })
 
   const app = express()
 
-  const server = new ApolloServer({ schema })
+  const server = new ApolloServer({
+    schema,
+    context: ({ req, res }) => ({ req, res }),
+    formatError: formatArgumentValidationError,
+  })
   server.applyMiddleware({ app })
   const port = process.env.PORT || 4000
   const url = await app.listen({ port })
