@@ -2,6 +2,8 @@ import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
 import { plainToClass } from 'class-transformer'
 import bcrypt from 'bcrypt'
 
+import { Context } from '../../types'
+
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 
@@ -42,7 +44,11 @@ class UserResolver {
   }
 
   @Mutation(returns => User)
-  async login(@Arg('data') { email, password }: LoginInput) {
+  async login(
+    @Arg('data') { email, password }: LoginInput,
+    @Ctx() { req, res }: Context,
+  ) {
+    console.log(req.cookies)
     const user = await this.userRepository.findOne({ where: { email } })
     if(!user) {
       throw new Error('user not found')
@@ -51,6 +57,7 @@ class UserResolver {
     if(!match) {
       throw new Error('wrong password')
     }
+    res.cookie('jwt', 'jjjjjwt')
     return user
   }
 }

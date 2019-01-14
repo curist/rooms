@@ -10,6 +10,7 @@ TypeGraphQL.useContainer(Container)
 const { formatArgumentValidationError } = TypeGraphQL
 
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import { ApolloServer, gql } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
 import resolvers from './resolvers'
@@ -29,6 +30,8 @@ async function start() {
   const schema = await buildSchema({ resolvers })
 
   const app = express()
+
+  app.use(cookieParser())
 
   const server = new ApolloServer({
     schema,

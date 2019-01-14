@@ -17,7 +17,6 @@ export class User {
   @Column()
   displayName: string
 
-  @Field()
   @Column()
   password: string
 }
