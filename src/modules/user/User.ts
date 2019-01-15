@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
+
+import { Room } from '../room/Room'
 
 @ObjectType({ description: 'User Type' })
 @Entity()
@@ -20,5 +22,9 @@ export class User {
 
   @Column()
   password: string
+
+  @Field(type => Room, { nullable: true })
+  @ManyToOne(type => Room)
+  room: Room
 }
 

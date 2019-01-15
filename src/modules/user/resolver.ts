@@ -21,16 +21,6 @@ class UserResolver {
     @InjectRepository(User) readonly userRepository: Repository<User>,
   ) {}
 
-  @Query(returns => User, { nullable: true })
-  async author(@Arg('authorName') authorName: string) {
-    const author = await this.userRepository.createQueryBuilder('user')
-      .where('LOWER(printf("%s %s", user.firstName, user.lastName)) LIKE LOWER(:author)', {
-        author: `%${authorName}%` 
-      })
-      .getOne()
-    return author
-  }
-
   @Query(returns => [User])
   users() {
     return this.userRepository.find()
@@ -39,7 +29,7 @@ class UserResolver {
   @Authorized()
   @Query(returns => User)
   me(@Ctx() { user }: Context) {
-    return this.userRepository.findOne(user.id)
+    return this.userRepository.findOneOrFail(user.id)
   }
 
   @Mutation(returns => User)
@@ -75,10 +65,7 @@ class UserResolver {
     @Arg('data') { email, password }: LoginInput,
     @Ctx() { req, res }: Context,
   ) {
-    const user = await this.userRepository.findOne({ where: { email } })
-    if(!user) {
-      throw new Error('user not found')
-    }
+    const user = await this.userRepository.findOneOrFail({ where: { email } })
     const match = await bcrypt.compare(password, user.password)
     if(!match) {
       throw new Error('wrong password')
