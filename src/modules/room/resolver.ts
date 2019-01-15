@@ -55,6 +55,7 @@ export default class RoomResolver {
       const moduleState = new RoomModuleState()
       moduleState.moduleType = m
       moduleState.room = room
+      // TODO init with something more meaningful
       moduleState.state = {}
       await this.roomModuleStateRepository.save(moduleState)
     }
@@ -63,7 +64,7 @@ export default class RoomResolver {
 
   @Authorized()
   @Mutation(returns => Room)
-  async setModules(
+  async setRoomModules(
     @Ctx() { user }: Context,
     @Arg('roomId') roomId: number,
     @Arg('modules', type => [RoomModuleTypeScalar]) modules: RoomModuleType[],
