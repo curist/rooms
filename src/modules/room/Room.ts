@@ -4,21 +4,6 @@ import { ObjectType, Field } from 'type-graphql'
 import { User } from '../user/User'
 import { RoomModuleType, RoomModuleTypeScalar } from './room-modules'
 
-class RoomModuleTransformer implements ValueTransformer {
-  to (value: RoomModuleType[]): string {
-    if(!value) {
-      return ''
-    }
-    return value.join(',')
-  }
-  from (value: string): RoomModuleType[] {
-    if(!value) {
-      return []
-    }
-    return value.split(',') as Array<RoomModuleType>
-  }
-}
-
 @ObjectType({ description: 'Room Type' })
 @Entity()
 export class Room {
@@ -36,7 +21,7 @@ export class Room {
   owner: User
 
   @Field(types => [RoomModuleTypeScalar])
-  @Column({ type: String, transformer: new RoomModuleTransformer() })
+  @Column('simple-array')
   roomModules: RoomModuleType[]
   // TODO
   // room may have
