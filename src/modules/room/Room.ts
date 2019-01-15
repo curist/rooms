@@ -9,13 +9,13 @@ class RoomModuleTransformer implements ValueTransformer {
     if(!value) {
       return ''
     }
-    return value.join(', ')
+    return value.join(',')
   }
   from (value: string): RoomModuleType[] {
     if(!value) {
       return []
     }
-    return value.split(', ') as Array<RoomModuleType>
+    return value.split(',') as Array<RoomModuleType>
   }
 }
 

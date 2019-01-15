@@ -9,6 +9,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 import { User } from '../user/User'
 import { Room } from './Room'
 import { roomModules, RoomModuleType, RoomModuleTypeScalar } from './room-modules'
+import { RoomModuleState } from '../room-module-state/RoomModuleState'
 
 
 @Resolver(Room)
@@ -16,6 +17,7 @@ export default class RoomResolver {
   constructor(
     @InjectRepository(Room) readonly roomRepository: Repository<Room>,
     @InjectRepository(User) readonly userRepository: Repository<User>,
+    @InjectRepository(RoomModuleState) readonly roomModuleStateRepository: Repository<RoomModuleState>,
   ) {}
 
   @Authorized()
@@ -49,6 +51,13 @@ export default class RoomResolver {
     await this.roomRepository.save(room)
     user.room = room
     await this.userRepository.save(user)
+    for(let m of modules) {
+      const moduleState = new RoomModuleState()
+      moduleState.moduleType = m
+      moduleState.room = room
+      moduleState.state = {}
+      await this.roomModuleStateRepository.save(moduleState)
+    }
     return room
   }
 
