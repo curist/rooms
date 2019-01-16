@@ -11,7 +11,7 @@ import { RoomModuleState } from './RoomModuleState'
 import { roomModules } from '../../room-modules/modules'
 import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
-import { JSONObject } from './RoomModuleState'
+import { JSONObject } from '../../types'
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
