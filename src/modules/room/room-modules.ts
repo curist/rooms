@@ -3,13 +3,13 @@ import { GraphQLScalarType, Kind } from 'graphql'
 // TODO
 // we can import real room modules here
 
-interface RoomFluxModule {
+export interface RoomFluxModule {
   defaultState: object;
   reducer: (state: object, action: object) => object;
   validate?: (state: object, action: object) => boolean;
 }
 
-interface RoomModules {
+export interface RoomModules {
   [key: string]: RoomFluxModule;
 }
 
