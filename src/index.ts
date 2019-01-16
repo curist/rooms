@@ -25,7 +25,7 @@ async function start() {
     location: 'database.sqlite',
     autoSave: true,
     synchronize: true,
-    logging: true,
+    logging: false,
     entities,
   })
 

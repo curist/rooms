@@ -11,7 +11,6 @@ import { RoomModuleState } from './RoomModuleState'
 import { roomModules } from '../../room-modules/modules'
 import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
-import GraphQLJSON from 'graphql-type-json'
 import { JSONObject } from './RoomModuleState'
 
 @Resolver(RoomModuleState)
@@ -40,9 +39,8 @@ class RoomModuleStateResolver {
   async updateRoomModuleState(
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleTypeScalar ) moduleType: RoomModuleType,
-    @Arg('action', types => GraphQLJSON) action: GraphQLJSON,
+    @Arg('action', types => JSONObject) action: any,
   ) {
-    console.log(action)
     const room = await this.roomRepository.findOneOrFail(roomId)
     const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
       where: {

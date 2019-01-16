@@ -6,12 +6,37 @@ import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
 import { GraphQLScalarType, Kind } from 'graphql'
 
+function parseLiteral(ast, variables) {
+  switch (ast.kind) {
+    case Kind.STRING:
+    case Kind.BOOLEAN:
+      return ast.value
+    case Kind.INT:
+    case Kind.FLOAT:
+      return parseFloat(ast.value);
+    case Kind.OBJECT: {
+      return ast.fields.reduce((value, field) => {
+        value[field.name.value] = parseLiteral(field.value, variables);
+        return value
+      }, {})
+    }
+    case Kind.LIST:
+      return ast.values.map(n => parseLiteral(n, variables))
+    case Kind.NULL:
+      return null
+    case Kind.VARIABLE: {
+      const name = ast.name.value
+      return variables ? variables[name] : undefined
+    }
+    default:
+      return undefined
+  }
+}
+
 export const JSONObject = new GraphQLScalarType({
   name: 'JSONObject',
   description: 'Generic JSON object',
   parseValue(value: string) {
-    console.log('parse')
-    console.log(value)
     try {
       return JSON.parse(value)
     } catch {
@@ -19,16 +44,9 @@ export const JSONObject = new GraphQLScalarType({
     }
   },
   serialize(value: any) {
-    console.log('searilize')
-    console.log(value)
     return value
   },
-  parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) {
-      return ast.value
-    }
-    return ''
-  },
+  parseLiteral,
 })
 
 @ObjectType({ description: 'RoomModuleState Type' })
