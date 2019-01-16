@@ -17,7 +17,7 @@ export const JSONObject = new GraphQLScalarType({
     }
   },
   serialize(value: any) {
-    return JSON.stringify(value)
+    return value
   },
   parseLiteral(ast) {
     if (ast.kind === Kind.STRING) {
