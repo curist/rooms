@@ -1,3 +1,4 @@
+import { roomModules } from './modules'
 import { GraphQLScalarType, Kind } from 'graphql'
 
 // TODO
@@ -11,17 +12,6 @@ export interface RoomFluxModule {
 
 export interface RoomModules {
   [key: string]: RoomFluxModule;
-}
-
-export const roomModules: RoomModules = {
-  chat: {
-    defaultState: {},
-    reducer: () => ({}),
-  },
-  avalon: {
-    defaultState: {},
-    reducer: () => ({}),
-  },
 }
 
 export type RoomModuleType = keyof typeof roomModules

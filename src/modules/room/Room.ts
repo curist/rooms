@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ValueTransformer, ManyToOne } f
 import { ObjectType, Field } from 'type-graphql'
 
 import { User } from '../user/User'
-import { RoomModuleType, RoomModuleTypeScalar } from './room-modules'
+import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
 @ObjectType({ description: 'Room Type' })
 @Entity()
@@ -23,14 +23,5 @@ export class Room {
   @Field(types => [RoomModuleTypeScalar])
   @Column('simple-array')
   roomModules: RoomModuleType[]
-  // TODO
-  // room may have
-  // state
-  // modules that alter state
-  // we can have a roomType set that can group some modules
-  //
-  // one way to model is to have
-  // ModuleState table
-  // which uses roomId and moduleId as composite key
 }
 

@@ -7,7 +7,12 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 
 import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
-import { RoomModuleType, roomModules } from '../room/room-modules'
+
+import { roomModules } from '../../room-modules/modules'
+import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
+
+import GraphQLJSON from 'graphql-type-json'
+import { JSONObject } from './RoomModuleState'
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
@@ -34,9 +39,10 @@ class RoomModuleStateResolver {
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
     @Arg('roomId') roomId: number,
-    @Arg('moduleType') moduleType: RoomModuleType,
-    @Arg('action') action: Object,
+    @Arg('moduleType', types => RoomModuleTypeScalar ) moduleType: RoomModuleType,
+    @Arg('action', types => GraphQLJSON) action: GraphQLJSON,
   ) {
+    console.log(action)
     const room = await this.roomRepository.findOneOrFail(roomId)
     const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
       where: {
@@ -47,6 +53,28 @@ class RoomModuleStateResolver {
     const { reducer } = roomModules[moduleType]
     const { state } = roomModuleState
     roomModuleState.state = reducer(state, action)
+    await this.roomModuleStateRepository.save(roomModuleState)
+    return roomModuleState
+  }
+
+  @Mutation(returns => RoomModuleState)
+  async chatroom_appendMessage(
+    @Arg('roomId') roomId: number,
+    @Arg('message') message: string,
+  ) {
+    const room = await this.roomRepository.findOneOrFail(roomId)
+    const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
+      where: {
+        room,
+        moduleType: 'chat',
+      },
+    })
+    const { reducer } = roomModules.chat
+    const { state } = roomModuleState
+    roomModuleState.state = reducer(state, {
+      type: 'appendMessage',
+      message,
+    })
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }

@@ -1,4 +1,5 @@
-import { RoomFluxModule } from '../../modules/room/room-modules'
+import { RoomFluxModule } from '../types'
+
 interface State {
   history: string[];
 }
@@ -13,6 +14,13 @@ const roomModule: ChatRoomModule = {
     history: [],
   },
   reducer: (state, action) => {
+    switch(action.type) {
+      case 'appendMessage': {
+        return {
+          history: state.history.concat(action.message),
+        }
+      }
+    }
     return state
   }
 }

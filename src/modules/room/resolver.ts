@@ -8,8 +8,10 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 
 import { User } from '../user/User'
 import { Room } from './Room'
-import { roomModules, RoomModuleType, RoomModuleTypeScalar } from './room-modules'
 import { RoomModuleState } from '../room-module-state/RoomModuleState'
+
+import { roomModules } from  '../../room-modules/modules'
+import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
 
 @Resolver(Room)
@@ -52,11 +54,11 @@ export default class RoomResolver {
     user.room = room
     await this.userRepository.save(user)
     for(let m of modules) {
+      const { defaultState } = roomModules[m]
       const moduleState = new RoomModuleState()
       moduleState.moduleType = m
       moduleState.room = room
-      // TODO init with something more meaningful
-      moduleState.state = {}
+      moduleState.state = defaultState
       await this.roomModuleStateRepository.save(moduleState)
     }
     return room

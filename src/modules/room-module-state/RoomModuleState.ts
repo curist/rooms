@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ValueTransformer, ManyToOne, Un
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
-import { RoomModuleType, RoomModuleTypeScalar } from '../room/room-modules'
+import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
 import { GraphQLScalarType, Kind } from 'graphql'
 
@@ -10,6 +10,8 @@ export const JSONObject = new GraphQLScalarType({
   name: 'JSONObject',
   description: 'Generic JSON object',
   parseValue(value: string) {
+    console.log('parse')
+    console.log(value)
     try {
       return JSON.parse(value)
     } catch {
@@ -17,6 +19,8 @@ export const JSONObject = new GraphQLScalarType({
     }
   },
   serialize(value: any) {
+    console.log('searilize')
+    console.log(value)
     return value
   },
   parseLiteral(ast) {
