@@ -1,11 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
 
 @ObjectType({ description: 'User Type' })
 @Entity()
-@Unique(['email'])
 export class User {
 
   @Field()
@@ -13,7 +12,7 @@ export class User {
   id: number
 
   @Field()
-  @Column()
+  @Column({ unique: true })
   email: string
 
   @Field()
