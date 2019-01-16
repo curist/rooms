@@ -1,4 +1,5 @@
-import { Resolver, Query, Mutation, Arg } from 'type-graphql'
+import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
+import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -35,6 +36,7 @@ class RoomModuleStateResolver {
 
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
+    @Ctx() { user }: Context,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
     @Arg('action', types => JSONObject) action: any,
@@ -48,7 +50,7 @@ class RoomModuleStateResolver {
     })
     const { reducer } = roomModules[moduleType]
     const { state } = roomModuleState
-    roomModuleState.state = reducer(state, action)
+    roomModuleState.state = reducer(state, action, user.id)
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }

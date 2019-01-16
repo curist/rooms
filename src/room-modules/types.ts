@@ -6,14 +6,14 @@ export enum RoomModuleType {
   Avalon = 'avalon',
 }
 
-export interface RoomFluxModule {
+export interface RoomReducerModule {
   defaultState: object;
-  reducer: (state: object, action: object) => object;
+  reducer: (state: object, action: object, userId?: number) => object;
   validate?: (state: object, action: object) => null | Error;
 }
 
 export type RoomModules = {
-  [key in RoomModuleType]: RoomFluxModule;
+  [key in RoomModuleType]: RoomReducerModule;
 }
 
 registerEnumType(RoomModuleType, {

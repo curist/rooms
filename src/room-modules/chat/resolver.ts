@@ -1,4 +1,5 @@
-import { Resolver, Mutation, Arg } from 'type-graphql'
+import { Resolver, Mutation, Arg, Ctx } from 'type-graphql'
+import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -19,6 +20,7 @@ export class ChatResolver {
 
   @Mutation(returns => RoomModuleState)
   async chatroom_appendMessage(
+    @Ctx() { user }: Context,
     @Arg('roomId') roomId: number,
     @Arg('message') message: string,
   ) {
@@ -33,7 +35,7 @@ export class ChatResolver {
     roomModuleState.state = reducer(state, {
       type: 'appendMessage',
       message,
-    })
+    }, user.id)
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }

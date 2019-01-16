@@ -1,7 +1,13 @@
-import { RoomFluxModule } from '../types'
+import { RoomReducerModule } from '../types'
+
+interface Message {
+  userId: number;
+  content: string;
+  timestamp: number;
+}
 
 interface State {
-  history: string[];
+  history: Message[];
 }
 
 interface ChatRoomModule {
@@ -13,11 +19,15 @@ const roomModule: ChatRoomModule = {
   defaultState: {
     history: [],
   },
-  reducer: (state, action) => {
+  reducer: (state, action, userId = 0) => {
     switch(action.type) {
       case 'appendMessage': {
         return {
-          history: state.history.concat(action.message),
+          history: state.history.concat({
+            userId,
+            content: action.message,
+            timestamp: + new Date(),
+          }),
         }
       }
     }
@@ -25,4 +35,4 @@ const roomModule: ChatRoomModule = {
   }
 }
 
-export default roomModule as RoomFluxModule
+export default roomModule as RoomReducerModule
