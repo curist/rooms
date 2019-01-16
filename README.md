@@ -1,7 +1,18 @@
-# Awesome Project Build with TypeORM
+# Rooms
 
-Steps to run this project:
+Rooms, GraphQL, and stuff.
 
-1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file
-3. Run `npm start` command
+# Getting started
+
+```sh
+yarn
+yarn start
+```
+
+# Running built project
+
+After build using `tsc`, run it using following command
+
+```sh
+node -r ts-node/register -r tsconfig-paths/register build/index.js
+```
