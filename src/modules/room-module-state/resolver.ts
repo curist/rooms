@@ -55,27 +55,6 @@ class RoomModuleStateResolver {
     return roomModuleState
   }
 
-  @Mutation(returns => RoomModuleState)
-  async chatroom_appendMessage(
-    @Arg('roomId') roomId: number,
-    @Arg('message') message: string,
-  ) {
-    const room = await this.roomRepository.findOneOrFail(roomId)
-    const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
-      where: {
-        room,
-        moduleType: 'chat',
-      },
-    })
-    const { reducer } = roomModules.chat
-    const { state } = roomModuleState
-    roomModuleState.state = reducer(state, {
-      type: 'appendMessage',
-      message,
-    })
-    await this.roomModuleStateRepository.save(roomModuleState)
-    return roomModuleState
-  }
 }
 
 export default RoomModuleStateResolver
