@@ -1,5 +1,5 @@
 import { InputType, Field } from 'type-graphql';
-import { MaxLength, Length } from 'class-validator';
+import { MaxLength } from 'class-validator';
 
 @InputType()
 export class LoginInput {

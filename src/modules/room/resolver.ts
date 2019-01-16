@@ -1,5 +1,4 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
-import { plainToClass } from 'class-transformer'
 
 import { Context } from '../../types'
 
@@ -11,7 +10,7 @@ import { Room } from './Room'
 import { RoomModuleState } from '../room-module-state/RoomModuleState'
 
 import { roomModules } from  '../../room-modules/modules'
-import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
+import { RoomModuleType } from '../../room-modules/types'
 
 
 @Resolver(Room)
@@ -40,7 +39,7 @@ export default class RoomResolver {
   async createRoom(
     @Ctx() { user: currentUser }: Context,
     @Arg('name') name: string,
-    @Arg('modules', type => [RoomModuleTypeScalar], {
+    @Arg('modules', type => [RoomModuleType], {
       nullable: true,
       defaultValue: [],
     }) modules?: RoomModuleType[],
@@ -69,7 +68,7 @@ export default class RoomResolver {
   async setRoomModules(
     @Ctx() { user }: Context,
     @Arg('roomId') roomId: number,
-    @Arg('modules', type => [RoomModuleTypeScalar]) modules: RoomModuleType[],
+    @Arg('modules', type => [RoomModuleType]) modules: RoomModuleType[],
   ) {
     // TODO how do we type check RoomModuleType
     // maybe use class-validator?

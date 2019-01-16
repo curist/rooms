@@ -1,34 +1,23 @@
-import { roomModules } from './modules'
-import { GraphQLScalarType, Kind } from 'graphql'
+import { registerEnumType } from 'type-graphql'
 
-// TODO
-// we can import real room modules here
+// XXX add new room module type here XXX
+export enum RoomModuleType {
+  Chat = 'chat',
+  Avalon = 'avalon',
+}
 
 export interface RoomFluxModule {
   defaultState: object;
   reducer: (state: object, action: object) => object;
-  validate?: (state: object, action: object) => boolean;
+  validate?: (state: object, action: object) => null | Error;
 }
 
-export interface RoomModules {
-  [key: string]: RoomFluxModule;
+export type RoomModules = {
+  [key in RoomModuleType]: RoomFluxModule;
 }
 
-export type RoomModuleType = keyof typeof roomModules
-
-export const RoomModuleTypeScalar = new GraphQLScalarType({
+registerEnumType(RoomModuleType, {
   name: 'RoomModuleType',
-  description: 'Room module scalar type',
-  parseValue(value: string) {
-    return value as RoomModuleType
-  },
-  serialize(value: RoomModuleType) {
-    return value as string
-  },
-  parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) {
-      return ast.value as RoomModuleType
-    }
-    return ''
-  },
+  description: 'Room module type enums',
 })
+

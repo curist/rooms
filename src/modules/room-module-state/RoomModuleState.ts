@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ValueTransformer, ManyToOne, Unique } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
-import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
+import { RoomModuleType } from '../../room-modules/types'
 
 import { JSONObject } from '../../types'
 
@@ -18,12 +18,12 @@ export class RoomModuleState {
   @ManyToOne(type => Room, { eager: true })
   room: Room
 
-  @Field(types => RoomModuleTypeScalar)
+  @Field(types => RoomModuleType)
   @Column({ type: String })
   moduleType: RoomModuleType
 
   @Field(types => JSONObject)
   @Column('simple-json')
-  state: Object
+  state: object
 }
 

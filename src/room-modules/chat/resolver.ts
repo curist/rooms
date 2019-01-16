@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
+import { Resolver, Mutation, Arg } from 'type-graphql'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -7,7 +7,6 @@ import { Room } from '../../modules/room/Room'
 import { RoomModuleState } from '../../modules/room-module-state/RoomModuleState'
 
 import roomModule from './module'
-import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
 
 const { reducer } = roomModule
 

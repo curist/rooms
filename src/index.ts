@@ -11,7 +11,7 @@ const { formatArgumentValidationError } = TypeGraphQL
 
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
 
 import jwt from './middlewares/jwt'
@@ -47,7 +47,7 @@ async function start() {
   })
   server.applyMiddleware({ app })
   const port = process.env.PORT || 4000
-  const url = await app.listen({ port })
+  await app.listen({ port })
   console.log(`🚀  Server started @ localhost:${port}`)
 }
 

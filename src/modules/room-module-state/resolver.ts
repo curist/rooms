@@ -1,6 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
-
-import { Context } from '../../types'
+import { Resolver, Query, Mutation, Arg } from 'type-graphql'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -9,7 +7,7 @@ import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
 
 import { roomModules } from '../../room-modules/modules'
-import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
+import { RoomModuleType } from '../../room-modules/types'
 
 import { JSONObject } from '../../types'
 
@@ -38,7 +36,7 @@ class RoomModuleStateResolver {
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
     @Arg('roomId') roomId: number,
-    @Arg('moduleType', types => RoomModuleTypeScalar ) moduleType: RoomModuleType,
+    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
     @Arg('action', types => JSONObject) action: any,
   ) {
     const room = await this.roomRepository.findOneOrFail(roomId)

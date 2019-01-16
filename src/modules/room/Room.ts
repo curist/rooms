@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ValueTransformer, ManyToOne } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
 import { User } from '../user/User'
-import { RoomModuleType, RoomModuleTypeScalar } from '../../room-modules/types'
+import { RoomModuleType } from '../../room-modules/types'
 
 @ObjectType({ description: 'Room Type' })
 @Entity()
@@ -20,7 +20,7 @@ export class Room {
   @ManyToOne(type => User, { eager: true })
   owner: User
 
-  @Field(types => [RoomModuleTypeScalar])
+  @Field(types => [RoomModuleType])
   @Column('simple-array')
   roomModules: RoomModuleType[]
 }
