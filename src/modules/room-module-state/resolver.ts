@@ -7,7 +7,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 
 import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
-import { RoomModuleType } from '../room/room-modules'
+import { RoomModuleType, roomModules } from '../room/room-modules'
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
@@ -35,14 +35,19 @@ class RoomModuleStateResolver {
   async updateRoomModuleState(
     @Arg('roomId') roomId: number,
     @Arg('moduleType') moduleType: RoomModuleType,
+    @Arg('action') action: Object,
   ) {
     const room = await this.roomRepository.findOneOrFail(roomId)
-    const roomModuleState = this.roomModuleStateRepository.findOneOrFail({
+    const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
       where: {
         room,
         moduleType,
       },
     })
+    const { reducer } = roomModules[moduleType]
+    const { state } = roomModuleState
+    roomModuleState.state = reducer(state, action)
+    await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }
 }

@@ -3,12 +3,24 @@ import { GraphQLScalarType, Kind } from 'graphql'
 // TODO
 // we can import real room modules here
 
-export const roomModules = {
+interface RoomFluxModule {
+  defaultState: object;
+  reducer: (state: object, action: object) => object;
+  validate?: (state: object, action: object) => boolean;
+}
+
+interface RoomModules {
+  [key: string]: RoomFluxModule;
+}
+
+export const roomModules: RoomModules = {
   chat: {
-    // XXX things
+    defaultState: {},
+    reducer: () => ({}),
   },
   avalon: {
-    // XXX things
+    defaultState: {},
+    reducer: () => ({}),
   },
 }
 
