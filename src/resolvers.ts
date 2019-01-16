@@ -1,8 +1,8 @@
-import UserResolver from './modules/user/resolver'
-import RoomResolver from './modules/room/resolver'
-import RoomModuleStateResolver from './modules/room-module-state/resolver'
+import UserResolver from 'src/modules/user/resolver'
+import RoomResolver from 'src/modules/room/resolver'
+import RoomModuleStateResolver from 'src/modules/room-module-state/resolver'
 
-import roomModuleResolvers from './room-modules/resolvers'
+import roomModuleResolvers from 'src/room-modules/resolvers'
 
 export default [
   UserResolver,

@@ -2,9 +2,9 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeo
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
-import { RoomModuleType } from '../../room-modules/types'
+import { RoomModuleType } from 'src/room-modules/types'
 
-import { JSONObject } from '../../types'
+import { JSONObject } from 'src/types'
 
 @ObjectType({ description: 'RoomModuleState Type' })
 @Entity()

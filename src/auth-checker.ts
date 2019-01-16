@@ -1,6 +1,6 @@
 import { AuthChecker } from 'type-graphql'
 
-import { Context } from './types'
+import { Context } from 'src/types'
 
 // TODO make this function more context aware
 // so it may dynamically pull roles data from database contextually

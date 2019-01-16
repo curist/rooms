@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import { Context } from '../../types'
+import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -13,7 +13,7 @@ import { RegisterInput } from './input/register'
 import { LoginInput } from './input/login'
 import { UpdateInput } from './input/update'
 
-import { JWT_SECRET } from '../../config'
+import { JWT_SECRET } from 'src/config'
 
 @Resolver(User)
 class UserResolver {

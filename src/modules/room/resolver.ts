@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 
-import { Context } from '../../types'
+import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
@@ -9,8 +9,8 @@ import { User } from '../user/User'
 import { Room } from './Room'
 import { RoomModuleState } from '../room-module-state/RoomModuleState'
 
-import { roomModules } from  '../../room-modules/modules'
-import { RoomModuleType } from '../../room-modules/types'
+import { roomModules } from  'src/room-modules/modules'
+import { RoomModuleType } from 'src/room-modules/types'
 
 
 @Resolver(Room)

@@ -14,10 +14,10 @@ import cookieParser from 'cookie-parser'
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'
 
-import jwt from './middlewares/jwt'
-import resolvers from './resolvers'
-import entities from './entities'
-import { authChecker } from './auth-checker'
+import jwt from 'src/middlewares/jwt'
+import resolvers from 'src/resolvers'
+import entities from 'src/entities'
+import { authChecker } from 'src/auth-checker'
 
 async function start() {
   await TypeORM.createConnection({
@@ -29,7 +29,6 @@ async function start() {
     entities,
   })
 
-  // TODO build user query resolver
   const schema = await buildSchema({
     resolvers,
     authChecker,

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { User } from './modules/user/User'
+import { User } from 'src/modules/user/User'
 
 export interface Context {
   req: Request;

@@ -6,10 +6,10 @@ import { InjectRepository } from 'typeorm-typedi-extensions'
 import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
 
-import { roomModules } from '../../room-modules/modules'
-import { RoomModuleType } from '../../room-modules/types'
+import { roomModules } from 'src/room-modules/modules'
+import { RoomModuleType } from 'src/room-modules/types'
 
-import { JSONObject } from '../../types'
+import { JSONObject } from 'src/types'
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {

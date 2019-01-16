@@ -7,6 +7,7 @@
       "@types/node": "^10.12.18",
       "ts-node": "7.0.1",
       "ts-node-dev": "^1.0.0-pre.32",
+      "tsconfig-paths": "^3.7.0",
       "typescript": "3.2.2"
    },
    "dependencies": {
@@ -26,7 +27,7 @@
       "typeorm-typedi-extensions": "^0.2.1"
    },
    "scripts": {
-      "start": "ts-node-dev src/index.ts",
-      "start:prod": "ts-node --transpileOnly src/index.ts"
+      "start": "ts-node-dev --respawn -r tsconfig-paths/register src/index.ts",
+      "start:prod": "ts-node --transpileOnly -r tsconfig-paths/register src/index.ts"
    }
 }

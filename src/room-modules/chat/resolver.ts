@@ -3,8 +3,8 @@ import { Resolver, Mutation, Arg } from 'type-graphql'
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 
-import { Room } from '../../modules/room/Room'
-import { RoomModuleState } from '../../modules/room-module-state/RoomModuleState'
+import { Room } from 'src/modules/room/Room'
+import { RoomModuleState } from 'src/modules/room-module-state/RoomModuleState'
 
 import roomModule from './module'
 

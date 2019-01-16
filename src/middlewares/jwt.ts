@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../config'
+import { JWT_SECRET } from 'src/config'
 
 export default async function(req, res, next) {
   if(req.cookies.jwt) {
