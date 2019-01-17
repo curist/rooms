@@ -1,4 +1,5 @@
-import { RoomReducerModule, RoomModuleContext, RoomModuleType } from '../types'
+import { Reducer } from 'src/types'
+import { RoomReducerModule, RoomModuleType } from '../types'
 
 const dependencies = [ RoomModuleType.Players ]
 
@@ -12,13 +13,11 @@ interface State {
   history: Message[];
 }
 
-interface Reducer {
-  (state: State, action, ctx: RoomModuleContext): State;
-}
+type Action = any
 
 const defaultState: State = { history: [] }
 
-const reducer: Reducer = (state, action, { userId }) => {
+const reducer: Reducer<State, Action> = (state, action, { userId }) => {
   switch(action.type) {
     case 'appendMessage': {
       return {
