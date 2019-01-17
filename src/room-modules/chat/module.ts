@@ -19,7 +19,9 @@ const roomModule: ChatRoomModule = {
   defaultState: {
     history: [],
   },
-  reducer: (state, action, { userId }) => {
+  reducer: (state, action, ctx) => {
+    const { userId, context } = ctx
+    console.log(context)
     switch(action.type) {
       case 'appendMessage': {
         return {

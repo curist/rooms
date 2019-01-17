@@ -48,11 +48,21 @@ class RoomModuleStateResolver {
         moduleType,
       },
     })
+    const roomModuleStates = (await this.roomModuleStateRepository.find({
+      where: {
+        room,
+      },
+    })).reduce((acc, r) => {
+      acc[r.moduleType] = r.state
+      return acc
+    }, {})
+    const moduleContext = {
+      userId: user.id,
+      context: roomModuleStates,
+    }
     const { reducer } = roomModules[moduleType]
     const { state } = roomModuleState
-    roomModuleState.state = reducer(state, action, {
-      userId: user.id,
-    })
+    roomModuleState.state = reducer(state, action, moduleContext)
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }

@@ -9,7 +9,7 @@ export enum RoomModuleType {
 export interface RoomModuleContext {
   userId: number;
   context?: {
-    [key in RoomModuleType]: any;
+    [key in RoomModuleType]?: any;
   }
 }
 
