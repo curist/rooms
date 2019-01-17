@@ -20,6 +20,7 @@ export type RoomModules = {
 
 export interface RoomModuleContext {
   userId: number;
+  ownerId: number;
   context?: {
     [key in RoomModuleType]?: any;
   }

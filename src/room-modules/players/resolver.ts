@@ -38,6 +38,7 @@ export class PlayersResolver {
       type: action,
     }, {
       userId: user.id,
+      ownerId: room.ownerId,
     })
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState

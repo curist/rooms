@@ -58,6 +58,7 @@ class RoomModuleStateResolver {
     }, {})
     const moduleContext = {
       userId: user.id,
+      ownerId: room.ownerId,
       context: roomModuleStates,
     }
     const { reducer } = roomModules[moduleType]

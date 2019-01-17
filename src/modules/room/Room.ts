@@ -19,9 +19,12 @@ export class Room {
   @Field(type => User)
   @ManyToOne(type => User, { eager: true })
   owner: User
+  @Column({ nullable: true })
+  ownerId: number
 
   @Field(types => [RoomModuleType])
   @Column('simple-array')
   roomModules: RoomModuleType[]
+
 }
 
