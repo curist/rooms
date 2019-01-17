@@ -14,8 +14,7 @@ export class RoomModuleState {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Field(type => Room)
-  @ManyToOne(type => Room, { eager: true })
+  @ManyToOne(type => Room)
   room: Room
 
   @Field(types => RoomModuleType)
