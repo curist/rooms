@@ -48,8 +48,6 @@ const roomModule: PlayersModule = {
         }
       }
       case Leave: {
-        console.log(Leave)
-        console.log(state)
         if(!(userId in playerIdMapping)) {
           return state
         }
@@ -60,7 +58,6 @@ const roomModule: PlayersModule = {
           acc[id] = i
           return acc
         }, {})
-        console.log(newPlayers, newPlayerIdMapping)
         return {
           players: newPlayers,
           playerIdMapping: newPlayerIdMapping,
