@@ -1,5 +1,5 @@
 import { PubSubEngine } from 'graphql-subscriptions'
-import { Resolver, Mutation, Subscription, Arg, Root, Ctx, PubSub } from 'type-graphql'
+import { Resolver, Mutation, Subscription, Arg, Root, Ctx, PubSub, ResolverFilterData } from 'type-graphql'
 import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
@@ -47,20 +47,36 @@ export class PlayersResolver {
     })
     await this.roomModuleStateRepository.save(roomModuleState)
     if(action == PlayerRoomModuleActionType.Join) {
-      await pubSub.publish('PLAYER_JOIN', { userId: user.id })
+      await pubSub.publish('PLAYER_JOIN', {
+        roomId,
+        userId: user.id,
+        action: 'join',
+      })
     } else {
-      await pubSub.publish('PLAYER_LEFT', { userId: user.id })
+      await pubSub.publish('PLAYER_LEFT', {
+        roomId,
+        userId: user.id,
+        action: 'left',
+      })
     }
     return roomModuleState
   }
 
   @Subscription({
-    topics: 'PLAYER_JOIN',
+    topics: ['PLAYER_JOIN', 'PLAYER_LEFT'],
+    filter: ({ args, payload }: ResolverFilterData<PlayerNotificationPayload>) => {
+      return args.roomId === payload.roomId
+    },
   })
   playersComeAndGo(
-    @Root() { userId }: PlayerNotificationPayload,
+    @Root() { userId, action }: PlayerNotificationPayload,
+    @Arg('roomId') roomId: number,
   ): PlayerNotification {
-    const playerNoty: PlayerNotification = { userId, action: 'foo' }
+    const playerNoty: PlayerNotification = {
+      userId,
+      action,
+      timestamp: new Date,
+    }
     return playerNoty
   }
 }

@@ -19,8 +19,13 @@ export class PlayerNotification {
 
   @Field()
   action: string;
+
+  @Field(types => Date)
+  timestamp: Date;
 }
 
 export interface PlayerNotificationPayload {
+  roomId: number;
   userId: number;
+  action: string;
 }
