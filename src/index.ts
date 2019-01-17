@@ -9,10 +9,14 @@ TypeGraphQL.useContainer(Container)
 
 const { formatArgumentValidationError } = TypeGraphQL
 
+import { createServer } from 'http'
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
+
+import { SubscriptionServer } from 'subscriptions-transport-ws'
+import { execute, subscribe } from 'graphql'
 
 import jwt from 'src/middlewares/jwt'
 import resolvers from 'src/resolvers'
@@ -39,15 +43,28 @@ async function start() {
   app.use(cookieParser())
   app.use(jwt)
 
-  const server = new ApolloServer({
+  const apollo = new ApolloServer({
     schema,
     context: ({ req, res }) => ({ req, res, user: req.user }),
     formatError: formatArgumentValidationError,
   })
-  server.applyMiddleware({ app })
+  apollo.applyMiddleware({ app })
+
+  const server = createServer(app)
+
   const port = process.env.PORT || 4000
-  await app.listen({ port })
-  console.log(`🚀  Server started @ localhost:${port}`)
+
+  server.listen(port, () => {
+    new SubscriptionServer({
+      execute,
+      subscribe,
+      schema,
+    }, {
+      server, path: '/graphql'
+    })
+
+    console.log(`🚀  Server started @ localhost:${port}`)
+  })
 }
 
 start()
