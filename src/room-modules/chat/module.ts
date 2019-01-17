@@ -1,4 +1,4 @@
-import { RoomReducerModule, RoomModuleContext } from '../types'
+import { RoomReducerModule, RoomModuleContext, RoomModuleType } from '../types'
 
 interface Message {
   userId: number;
@@ -12,6 +12,7 @@ interface State {
 
 interface ChatRoomModule {
   defaultState: State;
+  dependencies: RoomModuleType[];
   reducer: (state: State, action, ctx: RoomModuleContext) => State;
 }
 
@@ -19,6 +20,7 @@ const roomModule: ChatRoomModule = {
   defaultState: {
     history: [],
   },
+  dependencies: [ RoomModuleType.Players ],
   reducer: (state, action, { userId }) => {
     switch(action.type) {
       case 'appendMessage': {
