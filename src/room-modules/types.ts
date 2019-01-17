@@ -2,6 +2,7 @@ import { registerEnumType } from 'type-graphql'
 
 // XXX add new room module type here XXX
 export enum RoomModuleType {
+  Players = 'players',
   Chat = 'chat',
   Avalon = 'avalon',
 }
