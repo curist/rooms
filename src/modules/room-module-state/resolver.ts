@@ -50,7 +50,9 @@ class RoomModuleStateResolver {
     })
     const { reducer } = roomModules[moduleType]
     const { state } = roomModuleState
-    roomModuleState.state = reducer(state, action, user.id)
+    roomModuleState.state = reducer(state, action, {
+      userId: user.id,
+    })
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }
