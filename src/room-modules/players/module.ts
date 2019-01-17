@@ -19,53 +19,55 @@ interface State {
   };
 }
 
-interface PlayersModule {
-  defaultState: State;
-  reducer: (state: State, action: Action, ctx: RoomModuleContext) => State;
+interface Reducer {
+  (state: State, action: Action, ctx: RoomModuleContext): State;
 }
 
 const { Join, Leave } = PlayerRoomModuleActionType
 
-const roomModule: PlayersModule = {
-  defaultState: {
-    players: [],
-    playerIdMapping: {},
-  },
-  reducer: (state, action, { userId }) => {
-    const { players, playerIdMapping } = state
-    switch(action.type) {
-      case Join: {
-        if(userId in playerIdMapping) {
-          return state
-        }
-        const playerIndex = players.length
-        return {
-          players: players.concat(userId),
-          playerIdMapping: {
-            ...playerIdMapping,
-            [userId]: playerIndex,
-          },
-        }
-      }
-      case Leave: {
-        if(!(userId in playerIdMapping)) {
-          return state
-        }
-        const index = playerIdMapping[userId]
-        let newPlayers = players.slice(0)
-        newPlayers.splice(index, 1)
-        const newPlayerIdMapping = newPlayers.reduce((acc, id, i) => {
-          acc[id] = i
-          return acc
-        }, {})
-        return {
-          players: newPlayers,
-          playerIdMapping: newPlayerIdMapping,
-        }
-      }
-    }
-    return state
-  }
+const defaultState: State = {
+  players: [],
+  playerIdMapping: {},
 }
 
-export default roomModule as RoomReducerModule
+const reducer: Reducer = (state, action, { userId }) => {
+  const { players, playerIdMapping } = state
+  switch(action.type) {
+    case Join: {
+      if(userId in playerIdMapping) {
+        return state
+      }
+      const playerIndex = players.length
+      return {
+        players: players.concat(userId),
+        playerIdMapping: {
+          ...playerIdMapping,
+          [userId]: playerIndex,
+        },
+      }
+    }
+    case Leave: {
+      if(!(userId in playerIdMapping)) {
+        return state
+      }
+      const index = playerIdMapping[userId]
+      let newPlayers = players.slice(0)
+      newPlayers.splice(index, 1)
+      const newPlayerIdMapping = newPlayers.reduce((acc, id, i) => {
+        acc[id] = i
+        return acc
+      }, {})
+      return {
+        players: newPlayers,
+        playerIdMapping: newPlayerIdMapping,
+      }
+    }
+  }
+  return state
+}
+
+const roomModule: RoomReducerModule = {
+  defaultState,
+  reducer,
+}
+export default roomModule

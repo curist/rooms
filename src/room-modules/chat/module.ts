@@ -1,5 +1,7 @@
 import { RoomReducerModule, RoomModuleContext, RoomModuleType } from '../types'
 
+const dependencies = [ RoomModuleType.Players ]
+
 interface Message {
   userId: number;
   content: string;
@@ -10,31 +12,31 @@ interface State {
   history: Message[];
 }
 
-interface ChatRoomModule {
-  defaultState: State;
-  dependencies: RoomModuleType[];
-  reducer: (state: State, action, ctx: RoomModuleContext) => State;
+interface Reducer {
+  (state: State, action, ctx: RoomModuleContext): State;
 }
 
-const roomModule: ChatRoomModule = {
-  defaultState: {
-    history: [],
-  },
-  dependencies: [ RoomModuleType.Players ],
-  reducer: (state, action, { userId }) => {
-    switch(action.type) {
-      case 'appendMessage': {
-        return {
-          history: state.history.concat({
-            userId,
-            content: action.message,
-            timestamp: + new Date(),
-          }),
-        }
+const defaultState: State = { history: [] }
+
+const reducer: Reducer = (state, action, { userId }) => {
+  switch(action.type) {
+    case 'appendMessage': {
+      return {
+        history: state.history.concat({
+          userId,
+          content: action.message,
+          timestamp: + new Date(),
+        }),
       }
     }
-    return state
   }
+  return state
 }
 
-export default roomModule as RoomReducerModule
+
+const roomModule: RoomReducerModule = {
+  defaultState,
+  dependencies,
+  reducer,
+}
+export default roomModule
