@@ -35,7 +35,9 @@ export class ChatResolver {
     roomModuleState.state = reducer(state, {
       type: 'appendMessage',
       message,
-    }, user.id)
+    }, {
+      userId: user.id,
+    })
     await this.roomModuleStateRepository.save(roomModuleState)
     return roomModuleState
   }

@@ -52,10 +52,21 @@ export default class RoomResolver {
     await this.roomRepository.save(room)
     user.room = room
     await this.userRepository.save(user)
+    type ModuleToggle = {
+      [k in RoomModuleType]?: boolean;
+    }
+    let allModules: ModuleToggle = {}
     for(let m of modules) {
+      allModules[m] = true
+      const { dependencies = [] } = roomModules[m]
+      for(let dep of dependencies) {
+        allModules[dep] = true
+      }
+    }
+    for(let m in allModules) {
       const { defaultState } = roomModules[m]
       const moduleState = new RoomModuleState()
-      moduleState.moduleType = m
+      moduleState.moduleType = m as RoomModuleType
       moduleState.room = room
       moduleState.state = defaultState
       await this.roomModuleStateRepository.save(moduleState)
@@ -63,23 +74,5 @@ export default class RoomResolver {
     return room
   }
 
-  @Authorized()
-  @Mutation(returns => Room)
-  async setRoomModules(
-    @Ctx() { user }: Context,
-    @Arg('roomId') roomId: number,
-    @Arg('modules', type => [RoomModuleType]) modules: RoomModuleType[],
-  ) {
-    // TODO how do we type check RoomModuleType
-    // maybe use class-validator?
-    const room = await this.roomRepository.findOneOrFail(roomId)
-
-    if(room.owner.id !== user.id) {
-      throw new Error('access denied')
-    }
-    room.roomModules = modules
-    await this.roomRepository.save(room)
-    return room
-  }
 }
 

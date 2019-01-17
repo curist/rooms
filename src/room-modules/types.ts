@@ -8,12 +8,20 @@ export enum RoomModuleType {
 
 export interface RoomReducerModule {
   defaultState: object;
-  reducer: (state: object, action: object, userId?: number) => object;
+  reducer: (state: object, action: object, context: RoomModuleContext) => object;
+  dependencies?: RoomModuleType[];
   validate?: (state: object, action: object) => null | Error;
 }
 
 export type RoomModules = {
   [key in RoomModuleType]: RoomReducerModule;
+}
+
+export interface RoomModuleContext {
+  userId: number;
+  context?: {
+    [key in RoomModuleType]?: any;
+  }
 }
 
 registerEnumType(RoomModuleType, {
