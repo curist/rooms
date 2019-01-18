@@ -77,6 +77,7 @@ class RoomModuleStateResolver {
     await this.roomModuleStateRepository.save(roomModuleState)
     await publish({
       roomId,
+      moduleType,
       diff: delta,
       rev: roomModuleState.rev
     })
@@ -86,12 +87,13 @@ class RoomModuleStateResolver {
   @Subscription({
     topics: STATE_UPDATE_TOPIC,
     filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
-      return args.roomId === payload.roomId
+      return args.roomId === payload.roomId && args.moduleType === payload.moduleType
     },
   })
   roomModuleStateDiff(
     @Root() { diff, rev }: RoomModuleStateDiffPayload,
     @Arg('roomId') roomId: number,
+    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
   ): RoomModuleStateDiff {
     return { diff, rev }
   }
