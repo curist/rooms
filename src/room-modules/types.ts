@@ -13,6 +13,7 @@ export interface RoomReducerModule {
   reducer: (state: object, action: object, context: RoomModuleContext) => object;
   dependencies?: RoomModuleType[];
   validate?: (state: object, action: object) => null | Error;
+  transformState?: (state: object, context: RoomModuleContext) => object;
 }
 
 export type RoomModules = {
