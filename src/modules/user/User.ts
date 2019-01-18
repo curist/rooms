@@ -25,5 +25,7 @@ export class User {
   @Field(type => Room, { nullable: true })
   @ManyToOne(type => Room)
   room: Room
+  @Column({ nullable: true })
+  roomId: number
 }
 

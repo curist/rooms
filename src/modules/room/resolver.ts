@@ -25,7 +25,7 @@ export default class RoomResolver {
   @Query(returns => Room, { nullable: true })
   async room(@Ctx() { user: currentUser }: Context) {
     const user = await this.userRepository.findOneOrFail(currentUser)
-    const room = await this.roomRepository.findOne(user.room)
+    const room = await this.roomRepository.findOne(user.roomId)
     return room
   }
 
