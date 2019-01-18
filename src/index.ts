@@ -21,6 +21,7 @@ import { execute, subscribe } from 'graphql'
 import jwt from 'src/middlewares/jwt'
 import resolvers from 'src/resolvers'
 import entities from 'src/entities'
+import subscribers from 'src/subscribers'
 import { authChecker } from 'src/auth-checker'
 
 async function start() {
@@ -31,6 +32,7 @@ async function start() {
     synchronize: true,
     logging: false,
     entities,
+    subscribers,
   })
 
   const schema = await buildSchema({
