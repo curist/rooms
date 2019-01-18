@@ -87,15 +87,18 @@ class RoomModuleStateResolver {
   @Subscription({
     topics: STATE_UPDATE_TOPIC,
     filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
+      if(!args.moduleType) {
+        return args.roomId === payload.roomId
+      }
       return args.roomId === payload.roomId && args.moduleType === payload.moduleType
     },
   })
   roomModuleStateDiff(
-    @Root() { diff, rev }: RoomModuleStateDiffPayload,
+    @Root() { diff, rev, moduleType: payloadType }: RoomModuleStateDiffPayload,
     @Arg('roomId') roomId: number,
-    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
+    @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateDiff {
-    return { diff, rev }
+    return { diff, rev, moduleType: payloadType }
   }
 }
 

@@ -10,6 +10,9 @@ export class RoomModuleStateDiff {
 
   @Field()
   rev: number;
+
+  @Field(types => RoomModuleType)
+  moduleType: RoomModuleType;
 }
 
 export interface RoomModuleStateDiffPayload  {
