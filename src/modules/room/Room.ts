@@ -3,6 +3,7 @@ import { ObjectType, Field } from 'type-graphql'
 
 import { User } from '../user/User'
 import { RoomModuleType } from 'src/room-modules/types'
+import { JSONObject } from 'src/types'
 
 @ObjectType({ description: 'Room Type' })
 @Entity()
@@ -26,5 +27,7 @@ export class Room {
   @Column('simple-array')
   roomModules: RoomModuleType[]
 
+  @Field(types => [JSONObject])
+  roomModuleStates: object[]
 }
 

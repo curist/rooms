@@ -1,8 +1,8 @@
-import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
+import { Resolver, Query, Mutation, Arg, Ctx, Authorized, Root, FieldResolver } from 'type-graphql'
 
 import { Context } from 'src/types'
 
-import { Repository } from 'typeorm'
+import { Repository, In } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 
 import { User } from '../user/User'
@@ -29,9 +29,22 @@ export default class RoomResolver {
     return room
   }
 
+  @Authorized()
   @Query(returns => [Room])
   rooms() {
     return this.roomRepository.find()
+  }
+
+  @FieldResolver()
+  async roomModuleStates(@Root() room: Room) {
+    const states = await this.roomModuleStateRepository.find({
+      where: {
+        room,
+        moduleType: In(room.roomModules),
+      },
+    })
+
+    return states
   }
 
   @Authorized()

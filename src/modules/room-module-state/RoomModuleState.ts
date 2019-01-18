@@ -19,6 +19,8 @@ export class RoomModuleState {
 
   @ManyToOne(type => Room)
   room: Room
+  @Column({ nullable: true })
+  roomId: number
 
   @Field(types => RoomModuleType)
   @Column({ type: String })
