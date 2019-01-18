@@ -11,7 +11,7 @@ import { roomModules } from 'src/room-modules/modules'
 import { RoomModuleType } from 'src/room-modules/types'
 
 import { JSONObject } from 'src/types'
-import { RoomModuleStateDiff, RoomModuleStateDiffPayload, STATE_UPDATE_TOPIC } from './types'
+import { RoomModuleStateDiff, RoomModuleStateDiffPayload, RoomModuleStateUpdate, STATE_UPDATE_TOPIC } from './types'
 
 import { diff } from 'jsondiffpatch'
 
@@ -79,6 +79,7 @@ class RoomModuleStateResolver {
       roomId,
       moduleType,
       diff: delta,
+      state: nextState,
       rev: roomModuleState.rev
     })
     return roomModuleState
@@ -86,6 +87,25 @@ class RoomModuleStateResolver {
 
   @Subscription({
     topics: STATE_UPDATE_TOPIC,
+    description: 'When state updated, get the updated state',
+    filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
+      if(!args.moduleType) {
+        return args.roomId === payload.roomId
+      }
+      return args.roomId === payload.roomId && args.moduleType === payload.moduleType
+    },
+  })
+  roomModuleState(
+    @Root() { state, moduleType: payloadType }: RoomModuleStateDiffPayload,
+    @Arg('roomId') roomId: number,
+    @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
+  ): RoomModuleStateUpdate {
+    return { state, moduleType: payloadType }
+  }
+
+  @Subscription({
+    topics: STATE_UPDATE_TOPIC,
+    description: 'When state updated, get the state diff between current and previous states',
     filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
       if(!args.moduleType) {
         return args.roomId === payload.roomId

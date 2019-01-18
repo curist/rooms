@@ -15,10 +15,20 @@ export class RoomModuleStateDiff {
   moduleType: RoomModuleType;
 }
 
+@ObjectType()
+export class RoomModuleStateUpdate {
+  @Field(types => JSONObject)
+  state: object
+
+  @Field(types => RoomModuleType)
+  moduleType: RoomModuleType;
+}
+
 export interface RoomModuleStateDiffPayload  {
   roomId: number;
   moduleType: RoomModuleType;
   diff: object;
+  state: object;
   rev: number;
 }
 
