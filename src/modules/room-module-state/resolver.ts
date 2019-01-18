@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
+import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher } from 'type-graphql'
 import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
@@ -11,6 +11,9 @@ import { roomModules } from 'src/room-modules/modules'
 import { RoomModuleType } from 'src/room-modules/types'
 
 import { JSONObject } from 'src/types'
+import { RoomModuleStateDiff, RoomModuleStateDiffPayload, STATE_UPDATE_TOPIC } from './types'
+
+import { diff } from 'jsondiffpatch'
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
@@ -36,6 +39,7 @@ class RoomModuleStateResolver {
 
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
+    @PubSub(STATE_UPDATE_TOPIC) publish: Publisher<RoomModuleStateDiffPayload>,
     @Ctx() { user }: Context,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
@@ -63,11 +67,34 @@ class RoomModuleStateResolver {
     }
     const { reducer } = roomModules[moduleType]
     const { state } = roomModuleState
-    roomModuleState.state = reducer(state, action, moduleContext)
+    const nextState = reducer(state, action, moduleContext)
+    const delta = diff(state, nextState)
+    if(!delta) {
+      console.warn('user action makes no difference')
+      return roomModuleState
+    }
+    roomModuleState.state = nextState
     await this.roomModuleStateRepository.save(roomModuleState)
+    await publish({
+      roomId,
+      diff: delta,
+      rev: roomModuleState.rev
+    })
     return roomModuleState
   }
 
+  @Subscription({
+    topics: STATE_UPDATE_TOPIC,
+    filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
+      return args.roomId === payload.roomId
+    },
+  })
+  roomModuleStateDiff(
+    @Root() { diff, rev }: RoomModuleStateDiffPayload,
+    @Arg('roomId') roomId: number,
+  ): RoomModuleStateDiff {
+    return { diff, rev }
+  }
 }
 
 export default RoomModuleStateResolver
