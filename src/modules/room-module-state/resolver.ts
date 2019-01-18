@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher } from 'type-graphql'
+import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher, FieldResolver } from 'type-graphql'
 import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
@@ -35,6 +35,33 @@ class RoomModuleStateResolver {
       where: { room },
     })
     return roomModuleStates
+  }
+
+  @FieldResolver()
+  async state(
+    @Root() roomModuleState: RoomModuleState,
+    @Ctx() { user: { id: userId } }: Context,
+  ) {
+    const { state, moduleType } = roomModuleState
+    const { transformState } = roomModules[moduleType]
+    if(!transformState) {
+      return state
+    }
+    const room = await this.roomRepository.findOneOrFail(roomModuleState.roomId)
+    const roomModuleStates = (await this.roomModuleStateRepository.find({
+      where: {
+        roomId: roomModuleState.roomId,
+      },
+    })).reduce((acc, r) => {
+      acc[r.moduleType] = r.state
+      return acc
+    }, {})
+    const moduleContext = {
+      userId,
+      ownerId: room.ownerId,
+      context: roomModuleStates,
+    }
+    return transformState(state, moduleContext)
   }
 
   @Mutation(returns => RoomModuleState)
