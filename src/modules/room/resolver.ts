@@ -87,5 +87,20 @@ export default class RoomResolver {
     return room
   }
 
+  @Authorized()
+  @Mutation(returns => Room, { nullable: true })
+  async joinRoom(
+    @Ctx() { user: currentUser }: Context,
+    @Arg('roomId') roomId: number,
+  ) {
+    // TODO some kind of authorization to determine if user can join or not
+    // TODO how to propagate this event that user joined or left a room?
+    const room = await this.roomRepository.findOneOrFail(roomId)
+    const user = await this.userRepository.findOneOrFail(currentUser)
+    user.roomId = roomId
+    await this.userRepository.save(user)
+    return room
+  }
+
 }
 
