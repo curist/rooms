@@ -5,6 +5,7 @@ export enum RoomModuleType {
   Players = 'players',
   Chat = 'chat',
   Avalon = 'avalon',
+  Splendor = 'splendor',
 }
 
 export interface RoomReducerModule {
