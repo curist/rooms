@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm'
+import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
@@ -21,8 +22,26 @@ export class RoomModuleState {
   @Column({ type: String })
   moduleType: RoomModuleType
 
+  @Column('simple-json')
+  prevState: object
+
   @Field(types => JSONObject)
   @Column('simple-json')
   state: object
+
 }
 
+@EventSubscriber()
+export class RoomModuleStateSubscriber implements EntitySubscriberInterface<RoomModuleState> {
+  listenTo() {
+    return RoomModuleState
+  }
+
+  beforeInsert(event: InsertEvent<RoomModuleState>) {
+    event.entity.prevState = {}
+  }
+
+  beforeUpdate(event: UpdateEvent<RoomModuleState>) {
+    event.entity.prevState = event.databaseEntity.state
+  }
+}

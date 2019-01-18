@@ -7,7 +7,7 @@ export default async function(req, res, next) {
     try {
       req.user = jwt.verify(token, JWT_SECRET);
     } catch(err) {
-      // err
+      // err, maybe it's token expired
     }
   }
 
