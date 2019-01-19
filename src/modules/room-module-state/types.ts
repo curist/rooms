@@ -1,7 +1,7 @@
 import { ObjectType, Field } from 'type-graphql'
 import { JSONObject } from 'src/types'
 
-import { RoomModuleType } from 'src/room-modules/types'
+import { RoomModuleType } from 'room-module-types'
 
 @ObjectType()
 export class RoomModuleStateDiff {

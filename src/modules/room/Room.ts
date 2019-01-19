@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
 
 import { User } from '../user/User'
-import { RoomModuleType } from 'src/room-modules/types'
+import { RoomModuleType } from 'room-module-types'
 import { JSONObject } from 'src/types'
 
 @ObjectType({ description: 'Room Type' })

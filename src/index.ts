@@ -24,6 +24,8 @@ import entities from 'src/entities'
 import subscribers from 'src/subscribers'
 import { authChecker } from 'src/auth-checker'
 
+import './room-modules/register-types'
+
 async function start() {
   await TypeORM.createConnection({
     type: 'sqljs',

@@ -3,7 +3,7 @@ import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } 
 import { ObjectType, Field } from 'type-graphql'
 
 import { Room } from '../room/Room'
-import { RoomModuleType } from 'src/room-modules/types'
+import { RoomModuleType } from 'room-module-types'
 
 import { JSONObject } from 'src/types'
 
