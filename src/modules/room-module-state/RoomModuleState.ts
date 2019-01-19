@@ -13,7 +13,6 @@ import { diff } from 'jsondiffpatch'
 @Entity()
 @Unique(['room', 'moduleType'])
 export class RoomModuleState {
-  @Field()
   @PrimaryGeneratedColumn()
   id: number
 
@@ -26,6 +25,7 @@ export class RoomModuleState {
   @Column({ type: String })
   moduleType: RoomModuleType
 
+  @Field(types => JSONObject)
   @Column('simple-json')
   prevState: object
 
