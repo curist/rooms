@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher, FieldResolver } from 'type-graphql'
+import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher, FieldResolver, Authorized } from 'type-graphql'
 import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
@@ -24,18 +24,14 @@ class RoomModuleStateResolver {
     @InjectRepository(RoomModuleState) readonly roomModuleStateRepository: Repository<RoomModuleState>,
   ) {}
 
+  @Authorized()
   @Query(returns => [RoomModuleState])
-  async currentRoomModuleStates(@Ctx() { user: currentUser }: Context) {
+  async roomModuleStates(@Ctx() { user: currentUser }: Context) {
     const user = await this.userRepository.findOneOrFail(currentUser.id)
     if(!user.roomId) {
       return []
     }
     return await this.getRoomModuleStates(user.roomId)
-  }
-
-  @Query(returns => [RoomModuleState])
-  async roomModuleStates(@Arg('roomId') roomId: number) {
-    return await this.getRoomModuleStates(roomId)
   }
 
   async getRoomModuleStates(roomId: number) {
@@ -46,8 +42,9 @@ class RoomModuleStateResolver {
     return roomModuleStates
   }
 
+  @Authorized()
   @Query(returns => RoomModuleState, { nullable: true })
-  async currentRoomModuleState(
+  async roomModuleState(
     @Ctx() { user: currentUser }: Context,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
   ) {
@@ -56,14 +53,6 @@ class RoomModuleStateResolver {
       return {}
     }
     return await this.getRoomModuleState(user.roomId, moduleType)
-  }
-
-  @Query(returns => RoomModuleState, { nullable: true })
-  async roomModuleState(
-    @Arg('roomId') roomId: number,
-    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
-  ) {
-    return await this.getRoomModuleState(roomId, moduleType)
   }
 
   async getRoomModuleState(roomId: number, moduleType: RoomModuleType) {
@@ -101,14 +90,19 @@ class RoomModuleStateResolver {
     return transformState(state, moduleContext)
   }
 
+  @Authorized()
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
     @PubSub(STATE_UPDATE_TOPIC) publish: Publisher<RoomModuleStateDiffPayload>,
-    @Ctx() { user }: Context,
-    @Arg('roomId') roomId: number,
+    @Ctx() { user: currentUser }: Context,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
     @Arg('action', types => JSONObject) action: any,
   ) {
+    const user = await this.userRepository.findOneOrFail(currentUser.id)
+    const roomId = user.roomId
+    if(!roomId) {
+      throw new Error('user is not in any room')
+    }
     const room = await this.roomRepository.findOneOrFail(roomId)
     const roomModuleState = await this.roomModuleStateRepository.findOneOrFail({
       where: {
@@ -153,6 +147,7 @@ class RoomModuleStateResolver {
     return roomModuleState
   }
 
+  // XXX currently type-graphql cannot authorize a subscription
   @Subscription({
     topics: STATE_UPDATE_TOPIC,
     description: 'When state updated, get the updated state',

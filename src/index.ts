@@ -28,9 +28,8 @@ import './room-modules/register-types'
 
 async function start() {
   await TypeORM.createConnection({
-    type: 'sqljs',
-    location: 'database.sqlite',
-    autoSave: true,
+    type: 'sqlite',
+    database: 'database.sqlite',
     synchronize: true,
     logging: false,
     entities,
