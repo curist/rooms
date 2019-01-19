@@ -8,7 +8,7 @@ import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
 
 import { roomModules } from 'src/room-modules/modules'
-import { RoomModuleType } from 'src/room-modules/types'
+import { RoomModuleType } from 'room-module-types'
 
 import { JSONObject } from 'src/types'
 import { RoomModuleStateDiff, RoomModuleStateDiffPayload, RoomModuleStateUpdate, STATE_UPDATE_TOPIC } from './types'

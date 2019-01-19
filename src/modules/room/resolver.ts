@@ -10,7 +10,7 @@ import { Room } from './Room'
 import { RoomModuleState } from '../room-module-state/RoomModuleState'
 
 import { roomModules } from  'src/room-modules/modules'
-import { RoomModuleType } from 'src/room-modules/types'
+import { RoomModuleType } from 'room-module-types'
 
 
 @Resolver(Room)

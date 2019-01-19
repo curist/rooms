@@ -1,15 +1,10 @@
 import { Request, Response } from 'express'
 import { User } from 'src/modules/user/User'
-import { RoomModuleContext } from 'src/room-modules/types'
 
 export interface Context {
   req: Request;
   res: Response;
   user?: User;
-}
-
-export interface Reducer<State, Action> {
-  (state: State, action: Action, ctx: RoomModuleContext): State;
 }
 
 import { GraphQLScalarType, Kind } from 'graphql'

@@ -1,5 +1,5 @@
-import { Reducer } from 'src/types'
-import { RoomReducerModule } from '../types'
+import { RoomModuleReducer as Reducer } from 'room-module-types'
+import { RoomReducerModule } from 'room-module-types'
 import { PlayerRoomModuleActionType } from './types'
 
 // TODO we may extend this functionality of this to support things like 

@@ -1,5 +1,5 @@
-import { Reducer } from 'src/types'
-import { RoomReducerModule, RoomModuleType } from '../types'
+import { RoomModuleReducer as Reducer } from 'room-module-types'
+import { RoomReducerModule, RoomModuleType } from 'room-module-types'
 
 const dependencies = [ RoomModuleType.Players ]
 
