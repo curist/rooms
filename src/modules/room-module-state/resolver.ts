@@ -4,6 +4,7 @@ import { Context } from 'src/types'
 import { Repository } from 'typeorm'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 
+import { User } from '../user/User'
 import { Room } from '../room/Room'
 import { RoomModuleState } from './RoomModuleState'
 
@@ -18,12 +19,26 @@ import { diff } from 'jsondiffpatch'
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
   constructor(
+    @InjectRepository(User) readonly userRepository: Repository<User>,
     @InjectRepository(Room) readonly roomRepository: Repository<Room>,
     @InjectRepository(RoomModuleState) readonly roomModuleStateRepository: Repository<RoomModuleState>,
   ) {}
 
   @Query(returns => [RoomModuleState])
+  async currentRoomModuleStates(@Ctx() { user: currentUser }: Context) {
+    const user = await this.userRepository.findOneOrFail(currentUser.id)
+    if(!user.roomId) {
+      return []
+    }
+    return await this.getRoomModuleStates(user.roomId)
+  }
+
+  @Query(returns => [RoomModuleState])
   async roomModuleStates(@Arg('roomId') roomId: number) {
+    return await this.getRoomModuleStates(roomId)
+  }
+
+  async getRoomModuleStates(roomId: number) {
     const room = await this.roomRepository.findOneOrFail(roomId)
     const roomModuleStates = await this.roomModuleStateRepository.find({
       where: { room },
@@ -32,15 +47,31 @@ class RoomModuleStateResolver {
   }
 
   @Query(returns => RoomModuleState, { nullable: true })
+  async currentRoomModuleState(
+    @Ctx() { user: currentUser }: Context,
+    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
+  ) {
+    const user = await this.userRepository.findOneOrFail(currentUser.id)
+    if(!user.roomId) {
+      return {}
+    }
+    return await this.getRoomModuleState(user.roomId, moduleType)
+  }
+
+  @Query(returns => RoomModuleState, { nullable: true })
   async roomModuleState(
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
   ) {
+    return await this.getRoomModuleState(roomId, moduleType)
+  }
+
+  async getRoomModuleState(roomId: number, moduleType: RoomModuleType) {
     const room = await this.roomRepository.findOneOrFail(roomId)
     const roomModuleState = await this.roomModuleStateRepository.findOne({
       where: { room, moduleType },
     })
-    return roomModuleState
+    return roomModuleState || null
   }
 
   @FieldResolver()
