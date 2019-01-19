@@ -27,6 +27,10 @@ export class Room {
   @Column('simple-array')
   roomModules: RoomModuleType[]
 
+  @Field(types => [RoomModuleType])
+  @Column('simple-array')
+  roomModuleDeps: RoomModuleType[]
+
   @Field(types => [JSONObject])
   roomModuleStates: object[]
 }

@@ -1,5 +1,5 @@
 import { RoomModuleReducer as Reducer } from 'room-module-types'
-import { RoomReducerModule } from 'room-module-types'
+import { RoomReducerModule, RoomEventType } from 'room-module-types'
 import { PlayerRoomModuleActionType } from './types'
 
 // TODO we may extend this functionality of this to support things like 
@@ -13,7 +13,7 @@ interface Action {
   [k: string]: any;
 }
 
-interface State {
+export interface State {
   players: UserId[];
   playerIdMapping: {
     [userId: number]: PlayerIndex;
@@ -63,8 +63,22 @@ const reducer: Reducer<State, Action> = (state, action, { userId }) => {
   return state
 }
 
+const handleUserJoinRoom = (state: State, context) => {
+  const action = { type: Join }
+  return reducer(state, action, context)
+}
+
+const handleUserLeaveRoom = (state: State, context) => {
+  const action = { type: Leave }
+  return reducer(state, action, context)
+}
+
 const roomModule: RoomReducerModule = {
   defaultState,
   reducer,
+  hooks: {
+    [RoomEventType.UserJoinRoom]: handleUserJoinRoom,
+    [RoomEventType.UserLeaveRoom]: handleUserLeaveRoom,
+  },
 }
 export default roomModule

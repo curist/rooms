@@ -22,12 +22,6 @@ class RoomModuleStateResolver {
     @InjectRepository(RoomModuleState) readonly roomModuleStateRepository: Repository<RoomModuleState>,
   ) {}
 
-  // XXX for debug use only
-  @Query(returns => [RoomModuleState])
-  _roomModuleStates() {
-    return this.roomModuleStateRepository.find()
-  }
-
   @Query(returns => [RoomModuleState])
   async roomModuleStates(@Arg('roomId') roomId: number) {
     const room = await this.roomRepository.findOneOrFail(roomId)
@@ -35,6 +29,18 @@ class RoomModuleStateResolver {
       where: { room },
     })
     return roomModuleStates
+  }
+
+  @Query(returns => RoomModuleState, { nullable: true })
+  async roomModuleState(
+    @Arg('roomId') roomId: number,
+    @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
+  ) {
+    const room = await this.roomRepository.findOneOrFail(roomId)
+    const roomModuleState = await this.roomModuleStateRepository.findOne({
+      where: { room, moduleType },
+    })
+    return roomModuleState
   }
 
   @FieldResolver()
@@ -122,7 +128,7 @@ class RoomModuleStateResolver {
       return args.roomId === payload.roomId && args.moduleType === payload.moduleType
     },
   })
-  roomModuleState(
+  roomModuleStateSubscription(
     @Root() { state, moduleType: payloadType }: RoomModuleStateDiffPayload,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
@@ -140,7 +146,7 @@ class RoomModuleStateResolver {
       return args.roomId === payload.roomId && args.moduleType === payload.moduleType
     },
   })
-  roomModuleStateDiff(
+  roomModuleStateDiffSubscription(
     @Root() { diff, rev, moduleType: payloadType }: RoomModuleStateDiffPayload,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
