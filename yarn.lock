@@ -2453,10 +2453,10 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.3.tgz#81c0ce8f21474756148bbb5f3bfc0f36bf15d76e"
   integrity sha512-uBIcIl3Ih6Phe3XHK1NqboJLdGfwr1UN3k6wSD1dZpmPsIkb8AGNbZYJ1fOBk834+Gxy8rpfDxrS6XLEMZMY2g==
 
-splendor-room-module@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/splendor-room-module/-/splendor-room-module-1.0.0.tgz#a54e80d99a7340ac828a84e7f5bb06499372ed02"
-  integrity sha512-rnDl8qriBNOFwIrhk8YEYLInHDq6U9SJli4yXwyT86dMlaAi5syL54hEyux2R1EuRQwmPTS0dMLQs1ddJjl+ng==
+splendor-room-module@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/splendor-room-module/-/splendor-room-module-1.0.3.tgz#a2e56813958f2e548bb3a8f27855b12215b179dd"
+  integrity sha512-sCpxIp4yjk4qHUeJX4+ZTzMFfcwAr5ns98If9dP1kFDqevT07Or+EYR/U9CvItuPROHD9O0O+gAQv4W43SD74w==
   dependencies:
     baobab "^2.5.2"
     debug "^4.1.1"
