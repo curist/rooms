@@ -98,8 +98,12 @@ class RoomModuleStateResolver {
       ownerId: room.ownerId,
       context: roomModuleStates,
     }
-    const { reducer } = roomModules[moduleType]
+    const { reducer, validate = ((...args) => null) } = roomModules[moduleType]
     const { state } = roomModuleState
+    const err = validate(state, action, moduleContext)
+    if(err) {
+      throw err
+    }
     const nextState = reducer(state, action, moduleContext)
     const delta = diff(state, nextState)
     if(!delta) {
