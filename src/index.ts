@@ -14,6 +14,7 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
+import { pubSub } from 'src/pubSub'
 
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { execute, subscribe } from 'graphql'
@@ -39,6 +40,7 @@ async function start() {
   const schema = await buildSchema({
     resolvers,
     authChecker,
+    pubSub,
   })
 
   const app = express()

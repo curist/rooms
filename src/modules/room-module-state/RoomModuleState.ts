@@ -1,6 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm'
 import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
+import { STATE_UPDATE_TOPIC } from './types'
+
+import { pubSub } from 'src/pubSub'
 
 import { Room } from '../room/Room'
 import { RoomModuleType } from 'room-module-types'
@@ -40,6 +43,7 @@ export class RoomModuleState {
 
 @EventSubscriber()
 export class RoomModuleStateSubscriber implements EntitySubscriberInterface<RoomModuleState> {
+
   listenTo() {
     return RoomModuleState
   }
@@ -53,6 +57,14 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
     if(!delta) {
       return
     }
+
+    pubSub.publish(STATE_UPDATE_TOPIC, {
+      roomId: event.entity.roomId,
+      moduleType: event.entity.moduleType,
+      diff: delta,
+      state: event.entity.state,
+      rev: event.databaseEntity.rev + 1
+    })
 
     event.entity.prevState = event.databaseEntity.state
     event.entity.rev = event.databaseEntity.rev + 1

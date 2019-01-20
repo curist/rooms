@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, PubSub, Publisher, FieldResolver, Authorized } from 'type-graphql'
+import { Resolver, Query, Mutation, Subscription, Arg, Ctx, Root, ResolverFilterData, FieldResolver, Authorized } from 'type-graphql'
 import { Context } from 'src/types'
 
 import { Repository } from 'typeorm'
@@ -93,7 +93,6 @@ class RoomModuleStateResolver {
   @Authorized()
   @Mutation(returns => RoomModuleState)
   async updateRoomModuleState(
-    @PubSub(STATE_UPDATE_TOPIC) publish: Publisher<RoomModuleStateDiffPayload>,
     @Ctx() { user: currentUser }: Context,
     @Arg('moduleType', types => RoomModuleType) moduleType: RoomModuleType,
     @Arg('action', types => JSONObject) action: any,
@@ -137,13 +136,6 @@ class RoomModuleStateResolver {
     }
     roomModuleState.state = nextState
     await this.roomModuleStateRepository.save(roomModuleState)
-    await publish({
-      roomId,
-      moduleType,
-      diff: delta,
-      state: nextState,
-      rev: roomModuleState.rev
-    })
     return roomModuleState
   }
 
