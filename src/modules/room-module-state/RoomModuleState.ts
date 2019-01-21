@@ -24,6 +24,9 @@ export class RoomModuleState {
   @Column({ nullable: true })
   roomId: number
 
+  @Column()
+  ownerId: number
+
   @Field(types => RoomModuleType)
   @Column({ type: String })
   moduleType: RoomModuleType
@@ -57,12 +60,14 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
     if(!delta) {
       return
     }
+    const { roomId, state, moduleType, ownerId } = event.entity
 
     pubSub.publish(STATE_UPDATE_TOPIC, {
-      roomId: event.entity.roomId,
-      moduleType: event.entity.moduleType,
+      roomId,
+      moduleType,
+      ownerId,
       diff: delta,
-      state: event.entity.state,
+      state,
       rev: event.databaseEntity.rev + 1
     })
 

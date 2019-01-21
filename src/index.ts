@@ -19,7 +19,8 @@ import { pubSub } from 'src/pubSub'
 import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { execute, subscribe } from 'graphql'
 
-import jwt from 'src/middlewares/jwt'
+import cookie from 'cookie'
+import jwt, { verify as verifyJWT } from 'src/middlewares/jwt'
 import resolvers from 'src/resolvers'
 import entities from 'src/entities'
 import subscribers from 'src/subscribers'
@@ -64,6 +65,14 @@ async function start() {
       execute,
       subscribe,
       schema,
+      onConnect: (params, ws) => {
+        const cookies = cookie.parse(ws.upgradeReq.headers.cookie)
+        try {
+          return { user: verifyJWT(cookies.jwt) }
+        } catch {
+          return {}
+        }
+      }
     }, {
       server, path: '/graphql'
     })

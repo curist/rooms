@@ -26,6 +26,7 @@ export class RoomModuleStateUpdate {
 
 export interface RoomModuleStateDiffPayload  {
   roomId: number;
+  ownerId: number;
   moduleType: RoomModuleType;
   diff: object;
   state: object;

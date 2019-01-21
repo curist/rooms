@@ -730,7 +730,7 @@ cookie-signature@1.0.6:
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
   integrity sha1-4wOogrNCzD7oylE6eZmXNNqzriw=
 
-cookie@0.3.1:
+cookie@0.3.1, cookie@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
   integrity sha1-5+Ch+e9DtMi6klxcWpboBtFoc7s=
@@ -2574,10 +2574,10 @@ rimraf@^2.6.1:
   dependencies:
     glob "^7.1.3"
 
-room-module-types@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/room-module-types/-/room-module-types-1.3.0.tgz#a55f97ca53b2a3e06ee6c455f782c037f8f6137e"
-  integrity sha512-hrexoZTI5vFdQaFf96YLFKk4+k0YGIykKaiXWUDbEMJfthdaPLTU/1hJuSKYR1b1Tj8dRaHu31yS+Be1H0cbew==
+room-module-types@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/room-module-types/-/room-module-types-1.5.0.tgz#34a9d7cd73055aafadb30fe0008a2997fa3e9fba"
+  integrity sha512-T7jTDr8A44fRQwSf5BguWHDO68HuRIBnSRGN9gd4sDFch391vOn7Bm2Pkcl1N0NLR+scqN2R+dX3am6ldu0HuA==
 
 safe-buffer@5.1.2, safe-buffer@^5.0.1, safe-buffer@^5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
