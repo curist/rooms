@@ -56,7 +56,7 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
   }
 
   beforeUpdate(event: UpdateEvent<RoomModuleState>) {
-    const delta = diff(event.entity.state, event.databaseEntity.state)
+    const delta = diff(event.databaseEntity.state, event.entity.state)
     if(!delta) {
       return
     }
