@@ -16,6 +16,7 @@
       "bcrypt": "^3.0.3",
       "class-transformer": "^0.2.0",
       "class-validator": "^0.9.1",
+      "clone-deep": "^4.0.1",
       "cookie": "^0.3.1",
       "cookie-parser": "^1.4.3",
       "express": "^4.16.4",

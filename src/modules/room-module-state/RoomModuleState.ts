@@ -10,6 +10,8 @@ import { RoomModuleType } from 'room-module-types'
 
 import { JSONObject } from 'src/types'
 
+import clone from 'clone-deep'
+import { roomModules } from 'src/room-modules/modules'
 import { diff } from 'jsondiffpatch'
 
 @ObjectType({ description: 'RoomModuleState Type' })
@@ -61,12 +63,22 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
       return
     }
     const { roomId, state, moduleType, ownerId } = event.entity
-
+    const { transformState } = roomModules[moduleType]
+    const t = transformState || ( state => state )
+    const oldState = t(clone(event.databaseEntity.state), {
+      userId: -1,
+      ownerId,
+    })
+    const newState = t(clone(state), {
+      userId: -1,
+      ownerId,
+    })
+    const trueDelta = diff(oldState, newState)
     pubSub.publish(STATE_UPDATE_TOPIC, {
       roomId,
       moduleType,
       ownerId,
-      diff: delta,
+      diff: trueDelta,
       state,
       rev: event.databaseEntity.rev + 1
     })
