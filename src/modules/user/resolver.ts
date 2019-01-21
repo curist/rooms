@@ -33,13 +33,17 @@ class UserResolver {
   }
 
   @Mutation(returns => User)
-  async register(@Arg('data') data: RegisterInput) {
+  async register(
+    @Ctx() { res }: Context,
+    @Arg('data') data: RegisterInput,
+  ) {
     if(data.password !== data.passwordConfirmation) {
       throw new Error('password and confirmation mismatched')
     }
     data.password = await bcrypt.hash(data.password, 10)
     const newUser = plainToClass(User, data)
     await this.userRepository.save(newUser)
+    this.handleLogin(res, newUser)
     return newUser
   }
 
@@ -63,13 +67,18 @@ class UserResolver {
   @Mutation(returns => User)
   async login(
     @Arg('data') { email, password }: LoginInput,
-    @Ctx() { req, res }: Context,
+    @Ctx() { res }: Context,
   ) {
     const user = await this.userRepository.findOneOrFail({ where: { email } })
     const match = await bcrypt.compare(password, user.password)
     if(!match) {
       throw new Error('wrong password')
     }
+    this.handleLogin(res, user)
+    return user
+  }
+
+  handleLogin(res, user) {
     const token = jwt.sign({
       id: user.id,
       email: user.email,
@@ -77,7 +86,6 @@ class UserResolver {
       expiresIn: '1h',
     })
     res.cookie('jwt', token, { httpOnly: true })
-    return user
   }
 
   @Mutation(returns => Boolean)
