@@ -28,8 +28,10 @@ class UserResolver {
 
   @Authorized()
   @Query(returns => User)
-  me(@Ctx() { user }: Context) {
-    return this.userRepository.findOneOrFail(user.id)
+  async me(@Ctx() { user: { id: userId } }: Context) {
+    const user = await this.userRepository.findOneOrFail(userId)
+    await user.room
+    return user
   }
 
   @Mutation(returns => User)

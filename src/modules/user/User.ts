@@ -24,7 +24,7 @@ export class User {
 
   @Field(type => Room, { nullable: true })
   @ManyToOne(type => Room)
-  room: Room
+  room: Promise<Room>
   @Column({ nullable: true })
   roomId: number
 }
