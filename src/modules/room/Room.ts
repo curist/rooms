@@ -22,13 +22,13 @@ export class Room {
   @Column({ nullable: true })
   ownerId: number
 
-  @Field(types => [RoomModuleType])
-  @Column('simple-array')
-  roomModules: RoomModuleType[]
+  @Field(types => RoomModuleType)
+  @Column()
+  type: RoomModuleType
 
   @Field(types => [RoomModuleType])
   @Column('simple-array')
-  roomModuleDeps: RoomModuleType[]
+  modules: RoomModuleType[]
 
 }
 

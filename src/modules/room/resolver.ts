@@ -38,53 +38,44 @@ export default class RoomResolver {
     return this.roomRepository.find()
   }
 
+  getDependentModuleTypes(moduleType: RoomModuleType): RoomModuleType[] {
+    type ModuleToggle = {
+      [k in RoomModuleType]?: boolean;
+    }
+    const allModules: ModuleToggle = {}
+
+    function traverse(moduleType: RoomModuleType) {
+      allModules[moduleType] = true
+      const { dependencies = [] } = roomModules[moduleType]
+      for(let m of dependencies) {
+        if(allModules[m]) {
+          continue
+        }
+        allModules[m] = true
+        traverse(m)
+      }
+    }
+    traverse(moduleType)
+
+    return Object.keys(allModules) as RoomModuleType[]
+  }
+
   @Authorized()
   @Mutation(returns => Room)
   async createRoom(
     @Ctx() { user: currentUser }: Context,
     @Arg('name') name: string,
-    @Arg('modules', types => [RoomModuleType], {
-      nullable: true,
-      defaultValue: [],
-    }) modules?: RoomModuleType[],
+    @Arg('type', types => RoomModuleType) type: RoomModuleType,
   ) {
-    enum ModuleOrDep {
-      Module,
-      Dep,
-    }
-    type ModuleToggle = {
-      [k in RoomModuleType]?: ModuleOrDep;
-    }
-    const allModules: ModuleToggle = {}
-
-    for(let m of modules) {
-      allModules[m] = ModuleOrDep.Module
-      const { dependencies = [] } = roomModules[m]
-      for(let dep of dependencies) {
-        if(!allModules[dep]) {
-          allModules[dep] = ModuleOrDep.Dep
-        }
-      }
-    }
-    const roomModuleNames = []
-    const roomModuleDeps = []
-
-    for(let m in allModules) {
-      if(allModules[m] === ModuleOrDep.Module) {
-        roomModuleNames.push(m)
-      } else {
-        roomModuleDeps.push(m)
-      }
-    }
 
     const user = await this.userRepository.findOneOrFail(currentUser)
     const room = new Room()
     room.name = name
-    room.roomModules = roomModuleNames
-    room.roomModuleDeps = roomModuleDeps
+    room.type = type
+    room.modules = this.getDependentModuleTypes(type)
     room.owner = user
     await this.roomRepository.save(room)
-    for(let m in allModules) {
+    for(let m of room.modules) {
       const { defaultState } = roomModules[m]
       const moduleState = new RoomModuleState()
       moduleState.moduleType = m as RoomModuleType
@@ -130,7 +121,7 @@ export default class RoomResolver {
     const states = await this.roomModuleStateRepository.find({
       where: {
         room,
-        moduleType: In(room.roomModules.concat(room.roomModuleDeps)),
+        moduleType: In(room.modules),
       },
     })
     const roomModuleStates = states.reduce((acc, r) => {
@@ -166,7 +157,7 @@ export default class RoomResolver {
     const states = await this.roomModuleStateRepository.find({
       where: {
         room,
-        moduleType: In(room.roomModules.concat(room.roomModuleDeps)),
+        moduleType: In(room.modules),
       },
     })
     const roomModuleStates = states.reduce((acc, r) => {
