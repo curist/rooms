@@ -34,8 +34,13 @@ export default class RoomResolver {
 
   @Authorized()
   @Query(returns => [Room])
-  rooms() {
-    return this.roomRepository.find()
+  rooms(
+    @Arg('type', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
+  ) {
+    if(!moduleType) {
+      return this.roomRepository.find()
+    }
+    return this.roomRepository.find({ where: { type: moduleType } })
   }
 
   getDependentModuleTypes(moduleType: RoomModuleType): RoomModuleType[] {
@@ -103,9 +108,8 @@ export default class RoomResolver {
   @Mutation(returns => Boolean)
   async leaveRoom(
     @Ctx() { user: currentUser }: Context,
-    @Arg('roomId') roomId: number,
   ) {
-    return await this.userLeaveRoom(roomId, currentUser.id)
+    return await this.userLeaveRoom(currentUser.id)
   }
 
   // XXX maybe we should handle the logic whether a user can join a room here
@@ -115,7 +119,7 @@ export default class RoomResolver {
       // already in the room, do nothing
       return false
     } else if(user.roomId !== null && user.roomId !== roomId) {
-      await this.userLeaveRoom(roomId, userId)
+      await this.userLeaveRoom(userId)
     }
     const room = await this.roomRepository.findOneOrFail(roomId)
     const states = await this.roomModuleStateRepository.find({
@@ -147,13 +151,13 @@ export default class RoomResolver {
     return true
   }
 
-  async userLeaveRoom(roomId, userId): Promise<boolean> {
+  async userLeaveRoom(userId): Promise<boolean> {
     const user = await this.userRepository.findOneOrFail(userId)
-    if(user.roomId !== roomId) {
+    if(!user.roomId) {
       // XXX should not happen
       return false
     }
-    const room = await this.roomRepository.findOneOrFail(roomId)
+    const room = await this.roomRepository.findOneOrFail(user.roomId)
     const states = await this.roomModuleStateRepository.find({
       where: {
         room,
