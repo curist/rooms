@@ -1,7 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique } from 'typeorm'
 import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from 'typeorm'
 import { ObjectType, Field } from 'type-graphql'
-import { STATE_UPDATE_TOPIC } from './types'
+import {
+  RoomModuleStateUpdatePayload,
+  STATE_UPDATE_TOPIC,
+} from './types'
 
 import { pubSub } from 'src/pubSub'
 
@@ -10,9 +13,7 @@ import { RoomModuleType } from 'room-module-types'
 
 import { JSONObject } from 'src/types'
 
-import clone from 'clone-deep'
-import { roomModules } from 'src/room-modules/modules'
-import { diff } from '../../diff'
+import { diff } from 'src/diff'
 
 @ObjectType({ description: 'RoomModuleState Type' })
 @Entity()
@@ -62,29 +63,21 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
     if(!delta) {
       return
     }
+    const { state: prevState } = event.databaseEntity
     const { roomId, state, moduleType, ownerId } = event.entity
-    const { transformState } = roomModules[moduleType]
-    const t = transformState || ( state => state )
-    const oldState = t(clone(event.databaseEntity.state), {
-      userId: -1,
-      ownerId,
-    })
-    const newState = t(clone(state), {
-      userId: -1,
-      ownerId,
-    })
-    const trueDelta = diff(oldState, newState)
-    // XXX because of the transformation, the diff payload may not be able to apply on client state
-    pubSub.publish(STATE_UPDATE_TOPIC, {
-      roomId,
-      moduleType,
-      ownerId,
-      diff: trueDelta,
-      state,
-      rev: event.databaseEntity.rev + 1
-    })
+    const rev = event.databaseEntity.rev + 1
 
-    event.entity.prevState = event.databaseEntity.state
-    event.entity.rev = event.databaseEntity.rev + 1
+    const payload: RoomModuleStateUpdatePayload = {
+      moduleType,
+      roomId,
+      ownerId,
+      state,
+      prevState,
+      rev,
+    }
+    pubSub.publish(STATE_UPDATE_TOPIC, payload)
+
+    event.entity.prevState = prevState
+    event.entity.rev = rev
   }
 }
