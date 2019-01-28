@@ -12,23 +12,19 @@ import { roomModules } from 'src/room-modules/modules'
 import { RoomModuleType } from 'room-module-types'
 
 import { JSONObject } from 'src/types'
-import { RoomModuleStateDiff, RoomModuleStateDiffPayload, RoomModuleStateUpdate, STATE_UPDATE_TOPIC } from './types'
+import {
+  RoomModuleStateDiff,
+  RoomModuleStateUpdateWithContextPayload,
+  RoomModuleStateUpdate,
+  RoomModuleStateUpdatePayload,
+  STATE_UPDATE_TOPIC,
+  STATE_W_CONTEXT_UPDATE_TOPIC,
+} from './types'
 
-import { Config as DiffCfg, DiffPatcher } from 'jsondiffpatch';
-const conf: DiffCfg = {
-  objectHash: function(obj) {
-    return obj._id || obj.id || obj.name
-  },
-  arrays: {
-    detectMove: true,
-    includeValueOnMove: false,
-  },
-  textDiff: {
-    minLength: 60,
-  },
-  cloneDiffValues: false,
-};
-const { diff } = new DiffPatcher(conf)
+import { pubSub } from 'src/pubSub'
+
+import { diff } from 'src/diff'
+
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
@@ -36,7 +32,9 @@ class RoomModuleStateResolver {
     @InjectRepository(User) readonly userRepository: Repository<User>,
     @InjectRepository(Room) readonly roomRepository: Repository<Room>,
     @InjectRepository(RoomModuleState) readonly roomModuleStateRepository: Repository<RoomModuleState>,
-  ) {}
+  ) {
+    pubSub.subscribe(STATE_UPDATE_TOPIC, this.handleStateUpdate)
+  }
 
   @Authorized()
   @Query(returns => [RoomModuleState])
@@ -82,23 +80,18 @@ class RoomModuleStateResolver {
     @Root() roomModuleState: RoomModuleState,
     @Ctx() { user: { id: userId } }: Context,
   ) {
-    return await this.transformState(roomModuleState.state, {
+    const transformState = this.getStateTransformer(roomModuleState.moduleType)
+    const roomContext = await this.composeRoomStatesContext(roomModuleState.roomId)
+    return transformState(roomModuleState.state, {
       userId,
-      moduleType: roomModuleState.moduleType,
       ownerId: roomModuleState.ownerId,
+      context: roomContext,
     })
   }
 
-  transformState(state, { userId, moduleType, ownerId }) {
+  getStateTransformer(moduleType: RoomModuleType) {
     const { transformState } = roomModules[moduleType]
-    if(!transformState) {
-      return state
-    }
-    const moduleContext = {
-      userId,
-      ownerId,
-    }
-    return transformState(state, moduleContext)
+    return transformState || (state => state)
   }
 
   @Authorized()
@@ -120,18 +113,10 @@ class RoomModuleStateResolver {
         moduleType,
       },
     })
-    const roomModuleStates = (await this.roomModuleStateRepository.find({
-      where: {
-        room,
-      },
-    })).reduce((acc, r) => {
-      acc[r.moduleType] = r.state
-      return acc
-    }, {})
     const moduleContext = {
       userId: user.id,
       ownerId: room.ownerId,
-      context: roomModuleStates,
+      context: await this.composeRoomStatesContext(room.id),
     }
     const { reducer, validate = ((...args) => null) } = roomModules[moduleType]
     const { state } = roomModuleState
@@ -147,55 +132,99 @@ class RoomModuleStateResolver {
     }
     roomModuleState.state = nextState
     await this.roomModuleStateRepository.save(roomModuleState)
-    roomModuleState.state = await this.transformState(roomModuleState.state, {
-      userId: user.id,
-      ownerId: roomModuleState.ownerId,
-      moduleType: roomModuleState.moduleType,
-    })
+
     return roomModuleState
   }
 
   @Subscription({
-    topics: STATE_UPDATE_TOPIC,
+    topics: STATE_W_CONTEXT_UPDATE_TOPIC,
     description: 'When state updated, get the updated state',
-    filter: ({ args, payload, context }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
+    filter: ({ args, payload, context }: ResolverFilterData<RoomModuleStateUpdateWithContextPayload>) => {
+      const { roomId } = payload.context
       if(!args.moduleType) {
-        return args.roomId === payload.roomId
+        return args.roomId === roomId
       }
-      return args.roomId === payload.roomId && args.moduleType === payload.moduleType
+      return args.roomId === roomId && args.moduleType === payload.moduleType
     },
   })
   roomModuleStateSubscription(
     @Ctx() { user: currentUser }: Context,
-    @Root() { state: rawState, moduleType: payloadType, ownerId }: RoomModuleStateDiffPayload,
+    @Root() { state: rawState, rev, moduleType: payloadType, context }: RoomModuleStateUpdateWithContextPayload,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateUpdate {
-    const state = this.transformState(rawState, {
+    const { ownerId } = context
+    const transformState = this.getStateTransformer(payloadType)
+    const state = transformState(rawState, {
       userId: currentUser.id,
-      moduleType: payloadType,
       ownerId,
+      context: context.context,
     })
-    return { state, moduleType: payloadType }
+    return { state, rev, moduleType: payloadType }
   }
 
   @Subscription({
-    topics: STATE_UPDATE_TOPIC,
+    topics: STATE_W_CONTEXT_UPDATE_TOPIC,
     description: 'When state updated, get the state diff between current and previous states',
-    filter: ({ args, payload }: ResolverFilterData<RoomModuleStateDiffPayload>) => {
+    filter: ({ args, payload }: ResolverFilterData<RoomModuleStateUpdateWithContextPayload>) => {
+      const { roomId } = payload.context
       if(!args.moduleType) {
-        return args.roomId === payload.roomId
+        return args.roomId === roomId
       }
-      return args.roomId === payload.roomId && args.moduleType === payload.moduleType
+      return args.roomId === roomId && args.moduleType === payload.moduleType
     },
   })
   roomModuleStateDiffSubscription(
     @Ctx() { user: currentUser }: Context,
-    @Root() { diff, rev, moduleType: payloadType }: RoomModuleStateDiffPayload,
+    @Root() {
+      state,
+      prevState,
+      rev,
+      moduleType: payloadType,
+      context,
+    }: RoomModuleStateUpdateWithContextPayload,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateDiff {
-    return { diff, rev, moduleType: payloadType }
+    const transformState = this.getStateTransformer(payloadType)
+    const moduleContext = {
+      userId: currentUser.id,
+      ownerId: context.ownerId,
+      context: context.context,
+    }
+    const oldState = transformState(prevState, moduleContext)
+    const newState = transformState(state, moduleContext)
+    const delta = diff(oldState, newState)
+    return { diff: delta, rev, moduleType: payloadType }
+  }
+
+
+  private handleStateUpdate = async ({
+    moduleType, state, prevState, rev, roomId, ownerId,
+  }: RoomModuleStateUpdatePayload) => {
+    const context = {
+      roomId, ownerId,
+      context: await this.composeRoomStatesContext(roomId),
+    }
+    const payload: RoomModuleStateUpdateWithContextPayload = {
+      moduleType,
+      prevState,
+      state,
+      rev,
+      context,
+    }
+    pubSub.publish(STATE_W_CONTEXT_UPDATE_TOPIC, payload)
+  }
+
+  private composeRoomStatesContext = async (roomId: number) => {
+    return  (await this.roomModuleStateRepository.find({
+      where: {
+        roomId,
+      },
+    })).reduce((acc, r) => {
+      acc[r.moduleType] = r.state
+      return acc
+    }, {})
   }
 }
 

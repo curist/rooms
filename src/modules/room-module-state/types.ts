@@ -20,17 +20,33 @@ export class RoomModuleStateUpdate {
   @Field(types => JSONObject)
   state: object
 
+  @Field()
+  rev: number;
+
   @Field(types => RoomModuleType)
   moduleType: RoomModuleType;
 }
 
-export interface RoomModuleStateDiffPayload  {
+export interface RoomModuleStateUpdateWithContextPayload  {
+  moduleType: RoomModuleType;
+  prevState: object;
+  state: object;
+  rev: number;
+  context: {
+    roomId: number;
+    ownerId: number;
+    context: object;
+  };
+}
+
+export interface RoomModuleStateUpdatePayload  {
+  moduleType: RoomModuleType;
   roomId: number;
   ownerId: number;
-  moduleType: RoomModuleType;
-  diff: object;
+  prevState: object;
   state: object;
   rev: number;
 }
 
 export const STATE_UPDATE_TOPIC = 'ROOM_MODULE_STATE_UPDATED'
+export const STATE_W_CONTEXT_UPDATE_TOPIC = 'ROOM_MODULE_STATE_WITH_CONTEXT_UPDATED'
