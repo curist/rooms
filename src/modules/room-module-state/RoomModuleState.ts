@@ -12,7 +12,7 @@ import { JSONObject } from 'src/types'
 
 import clone from 'clone-deep'
 import { roomModules } from 'src/room-modules/modules'
-import { diff } from 'jsondiffpatch'
+import { diff } from '../../diff'
 
 @ObjectType({ description: 'RoomModuleState Type' })
 @Entity()
