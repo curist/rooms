@@ -74,6 +74,7 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
       ownerId,
     })
     const trueDelta = diff(oldState, newState)
+    // XXX because of the transformation, the diff payload may not be able to apply on client state
     pubSub.publish(STATE_UPDATE_TOPIC, {
       roomId,
       moduleType,
