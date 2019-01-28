@@ -86,7 +86,6 @@ export default class RoomResolver {
       moduleState.moduleType = m as RoomModuleType
       moduleState.room = room
       moduleState.state = defaultState
-      moduleState.ownerId = user.id
       await this.roomModuleStateRepository.save(moduleState)
     }
 

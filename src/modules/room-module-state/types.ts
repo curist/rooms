@@ -32,9 +32,9 @@ export interface RoomModuleStateUpdateWithContextPayload  {
   prevState: object;
   state: object;
   rev: number;
+  ownerId: number;
   context: {
     roomId: number;
-    ownerId: number;
     context: object;
   };
 }
@@ -42,7 +42,6 @@ export interface RoomModuleStateUpdateWithContextPayload  {
 export interface RoomModuleStateUpdatePayload  {
   moduleType: RoomModuleType;
   roomId: number;
-  ownerId: number;
   prevState: object;
   state: object;
   rev: number;

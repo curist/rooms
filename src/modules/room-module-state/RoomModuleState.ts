@@ -27,9 +27,6 @@ export class RoomModuleState {
   @Column({ nullable: true })
   roomId: number
 
-  @Column()
-  ownerId: number
-
   @Field(types => RoomModuleType)
   @Column({ type: String })
   moduleType: RoomModuleType
@@ -64,13 +61,12 @@ export class RoomModuleStateSubscriber implements EntitySubscriberInterface<Room
       return
     }
     const { state: prevState } = event.databaseEntity
-    const { roomId, state, moduleType, ownerId } = event.entity
+    const { roomId, state, moduleType } = event.entity
     const rev = event.databaseEntity.rev + 1
 
     const payload: RoomModuleStateUpdatePayload = {
       moduleType,
       roomId,
-      ownerId,
       state,
       prevState,
       rev,

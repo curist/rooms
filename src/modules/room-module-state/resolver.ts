@@ -84,11 +84,12 @@ class RoomModuleStateResolver {
     @Root() roomModuleState: RoomModuleState,
     @Ctx() { user: { id: userId } }: Context,
   ) {
+    const room = await this.roomRepository.findOneOrFail(roomModuleState.roomId)
     const transformState = getStateTransformer(roomModuleState.moduleType)
     const roomContext = await this.composeRoomStatesContext(roomModuleState.roomId)
     return transformState(roomModuleState.state, {
       userId,
-      ownerId: roomModuleState.ownerId,
+      ownerId: room.ownerId,
       context: roomContext,
     })
   }
@@ -149,15 +150,14 @@ class RoomModuleStateResolver {
   })
   roomModuleStateSubscription(
     @Ctx() { user: currentUser }: Context,
-    @Root() { state: rawState, rev, moduleType: payloadType, context }: RoomModuleStateUpdateWithContextPayload,
+    @Root() { state: rawState, ownerId, rev, moduleType: payloadType, context }: RoomModuleStateUpdateWithContextPayload,
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateUpdate {
-    const { ownerId } = context
     const transformState = getStateTransformer(payloadType)
     const state = transformState(rawState, {
-      userId: currentUser.id,
       ownerId,
+      userId: currentUser.id,
       context: context.context,
     })
     return { state, rev, moduleType: payloadType }
@@ -180,6 +180,7 @@ class RoomModuleStateResolver {
       state,
       prevState,
       rev,
+      ownerId,
       moduleType: payloadType,
       context,
     }: RoomModuleStateUpdateWithContextPayload,
@@ -188,8 +189,8 @@ class RoomModuleStateResolver {
   ): RoomModuleStateDiff {
     const transformState = getStateTransformer(payloadType)
     const moduleContext = {
+      ownerId,
       userId: currentUser.id,
-      ownerId: context.ownerId,
       context: context.context,
     }
     const oldState = transformState(prevState, moduleContext)
@@ -200,10 +201,11 @@ class RoomModuleStateResolver {
 
 
   private handleStateUpdate = async ({
-    moduleType, state, prevState, rev, roomId, ownerId,
+    moduleType, state, prevState, rev, roomId,
   }: RoomModuleStateUpdatePayload) => {
+    const room = await this.roomRepository.findOneOrFail(roomId)
     const context = {
-      roomId, ownerId,
+      roomId,
       context: await this.composeRoomStatesContext(roomId),
     }
     const payload: RoomModuleStateUpdateWithContextPayload = {
@@ -211,6 +213,7 @@ class RoomModuleStateResolver {
       prevState,
       state,
       rev,
+      ownerId: room.ownerId,
       context,
     }
     pubSub.publish(STATE_W_CONTEXT_UPDATE_TOPIC, payload)
