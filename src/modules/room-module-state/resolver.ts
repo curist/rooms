@@ -25,6 +25,10 @@ import { pubSub } from 'src/pubSub'
 
 import { diff } from 'src/diff'
 
+const getStateTransformer = (moduleType: RoomModuleType) => {
+  const { transformState } = roomModules[moduleType]
+  return transformState || (state => state)
+}
 
 @Resolver(RoomModuleState)
 class RoomModuleStateResolver {
@@ -80,7 +84,7 @@ class RoomModuleStateResolver {
     @Root() roomModuleState: RoomModuleState,
     @Ctx() { user: { id: userId } }: Context,
   ) {
-    const transformState = this.getStateTransformer(roomModuleState.moduleType)
+    const transformState = getStateTransformer(roomModuleState.moduleType)
     const roomContext = await this.composeRoomStatesContext(roomModuleState.roomId)
     return transformState(roomModuleState.state, {
       userId,
@@ -89,10 +93,6 @@ class RoomModuleStateResolver {
     })
   }
 
-  getStateTransformer(moduleType: RoomModuleType) {
-    const { transformState } = roomModules[moduleType]
-    return transformState || (state => state)
-  }
 
   @Authorized()
   @Mutation(returns => RoomModuleState)
@@ -154,7 +154,7 @@ class RoomModuleStateResolver {
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateUpdate {
     const { ownerId } = context
-    const transformState = this.getStateTransformer(payloadType)
+    const transformState = getStateTransformer(payloadType)
     const state = transformState(rawState, {
       userId: currentUser.id,
       ownerId,
@@ -186,7 +186,7 @@ class RoomModuleStateResolver {
     @Arg('roomId') roomId: number,
     @Arg('moduleType', types => RoomModuleType, { nullable: true }) moduleType?: RoomModuleType,
   ): RoomModuleStateDiff {
-    const transformState = this.getStateTransformer(payloadType)
+    const transformState = getStateTransformer(payloadType)
     const moduleContext = {
       userId: currentUser.id,
       ownerId: context.ownerId,
