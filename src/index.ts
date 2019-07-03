@@ -2,12 +2,8 @@ import 'reflect-metadata'
 
 import { Container } from 'typedi'
 import * as TypeORM from 'typeorm'
-import * as TypeGraphQL from 'type-graphql'
 
 TypeORM.useContainer(Container)
-TypeGraphQL.useContainer(Container)
-
-const { formatArgumentValidationError } = TypeGraphQL
 
 import { createServer } from 'http'
 import express from 'express'
@@ -42,6 +38,7 @@ async function start() {
     resolvers,
     authChecker,
     pubSub,
+    container: Container,
   })
 
   const app = express()
@@ -51,8 +48,8 @@ async function start() {
 
   const apollo = new ApolloServer({
     schema,
-    context: ({ req, res }) => ({ req, res, user: req.user }),
-    formatError: formatArgumentValidationError,
+    context: ({ req, res }: any) => ({ req, res, user: req.user }),
+    debug: false,
   })
   apollo.applyMiddleware({ app })
 
