@@ -6,7 +6,6 @@ import { Room } from '../room/Room'
 @ObjectType({ description: 'User Type' })
 @Entity()
 export class User {
-
   @Field()
   @PrimaryGeneratedColumn()
   id: number

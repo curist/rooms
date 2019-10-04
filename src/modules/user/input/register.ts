@@ -15,8 +15,4 @@ export class RegisterInput {
   @Field()
   @MaxLength(100)
   password: string
-
-  @Field()
-  @MaxLength(100)
-  passwordConfirmation: string
 }

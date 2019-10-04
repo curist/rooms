@@ -39,9 +39,6 @@ class UserResolver {
     @Ctx() { res }: Context,
     @Arg('data') data: RegisterInput,
   ) {
-    if(data.password !== data.passwordConfirmation) {
-      throw new Error('password and confirmation mismatched')
-    }
     data.password = await bcrypt.hash(data.password, 10)
     const newUser = plainToClass(User, data)
     await this.userRepository.save(newUser)
