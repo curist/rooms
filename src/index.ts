@@ -7,6 +7,7 @@ TypeORM.useContainer(Container)
 
 import { createServer } from 'http'
 import express from 'express'
+import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
@@ -43,6 +44,12 @@ async function start() {
 
   const app = express()
 
+  if(process.env.NODE_ENV === 'development') {
+    app.use(cors({
+      origin: true,
+      credentials: true,
+    }))
+  }
   app.use(cookieParser())
   app.use(jwt)
 
@@ -51,7 +58,7 @@ async function start() {
     context: ({ req, res }: any) => ({ req, res, user: req.user }),
     debug: false,
   })
-  apollo.applyMiddleware({ app })
+  apollo.applyMiddleware({ app, cors: false })
 
   const server = createServer(app)
 

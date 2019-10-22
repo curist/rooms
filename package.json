@@ -18,6 +18,7 @@
       "class-validator": "^0.9.1",
       "cookie": "^0.3.1",
       "cookie-parser": "^1.4.3",
+      "cors": "^2.8.5",
       "express": "^4.16.4",
       "graphql": "^14.1.1",
       "graphql-subscriptions": "^1.0.0",
@@ -35,6 +36,6 @@
    },
    "scripts": {
       "start": "ts-node-dev --respawn -r tsconfig-paths/register src/index.ts",
-      "start:prod": "ts-node --transpileOnly -r tsconfig-paths/register src/index.ts"
+      "start:prod": "ts-node -r tsconfig-paths/register src/index.ts"
    }
 }
