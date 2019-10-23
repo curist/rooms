@@ -2347,11 +2347,6 @@ rimraf@^2.6.1:
   dependencies:
     glob "^7.1.3"
 
-room-module-types@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/room-module-types/-/room-module-types-1.6.0.tgz#81520c9f0150c9fdfdb815f14ba49463e3758c51"
-  integrity sha512-f82j4jLPYO4/ZEHV0/gcQAg8aI1VXAupAX5hyMoy+YqIRGencvD8xDNqG37iizmnDSWtYPkE3sZGwYjtTjVT0g==
-
 safe-buffer@5.1.2, safe-buffer@^5.0.1, safe-buffer@^5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
