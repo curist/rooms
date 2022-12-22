@@ -23,7 +23,7 @@
       "graphql": "^14.1.1",
       "graphql-subscriptions": "^1.0.0",
       "jsondiffpatch": "^0.3.11",
-      "jsonwebtoken": "^8.4.0",
+      "jsonwebtoken": "^9.0.0",
       "reflect-metadata": "^0.1.10",
       "splendor-room-module": "^1.4.1",
       "sqlite3": "^4.0.8",
